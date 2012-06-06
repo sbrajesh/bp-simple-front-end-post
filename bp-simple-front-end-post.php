@@ -3,7 +3,7 @@
 Plugin Name: BP Simple Front End Post
 Plugin URI: http://buddydev.com/plugins/bp-simple-front-end-post/
 Description: provides the ability to create unlimited post forms and allow users to save the post from front end.It is much powerful than it looks.
-Version: 1.0
+Version: 1.0.1
 Author: Brajesh Singh
 Author URI: http://buddydev.com/members/sbrajesh/
 License: GPL
@@ -155,6 +155,8 @@ class BPSimpleBlogPostEditForm{
     var $show_tags=false;//not implemented
     var $allowed_categories=array();//if there are any
     var $allowed_tags=array();//not implemented, 
+    private $upload_count=0;
+
     //will include support for custom taxonomies soooooon
 
 function __construct($name,$settings){
@@ -166,7 +168,8 @@ function __construct($name,$settings){
                     'allowed_categories'=>array(),
                     'allowed_tags'=>array(),
                     'post_author'=>false,
-                    'can_user_can_post'=>false
+                    'can_user_can_post'=>false,
+                    'upload_count'=>0
         );
     
     $args=wp_parse_args($settings, $default);
@@ -184,7 +187,7 @@ function __construct($name,$settings){
         $this->post_author=bp_loggedin_user_id ();
     
    $this->current_user_can_post=$current_user_can_post;//we will change later for context
-    
+   $this->upload_count=$upload_count;
 }
 
 //render form
@@ -196,12 +199,13 @@ function show() {
 
         <div class="bp-simple-post-form">
        
-        <form class="standard-form bp-simple-post-form"  method="post" action="">
+        <form class="standard-form bp-simple-post-form"  method="post" action=""  enctype="multipart/form-data">
             
             
             <input type="hidden" name="bp_simple_post_form_id" value="<?php echo $this->id;?>" />
             <?php wp_nonce_field( 'bp_simple_post_new_post_'.$this->id ); ?>
-           
+            <input type="hidden" name="action" value="bp_simple_post_new_post_<?php echo $this->id;?>" />
+		
                     
 
              <label for="bp_simple_post_title"><?php _e('Title:','bsfep');?>
@@ -210,9 +214,18 @@ function show() {
             
              <label for="bp_simple_post_text" ><?php _e('Post:','bsfep');?>
                 <textarea name="bp_simple_post_text" id="bp_simple_post_text" tabindex="2" ></textarea>
-             </label>   
-             
+             </label>
+            <?php if($this->upload_count):?>
             
+                <label> <?php _e('Uploads','bsfep');?></label>
+                
+                <div class="bp_simple_post_uploads_input">
+                 <?php for($i=0;$i<$this->upload_count;$i++):?>
+                    <label><input type="file" name="bp_simple_post_upload_<?php echo $i;?>" /></label>
+                <?php endfor;?>
+               
+                </div>
+            <?php endif;?>
             <?php if ($this->show_categories):?> 
                 <label for="cats" id="bp_simple_post_cats"><?php _e('Category:','bsfep');?></label>
                     <ul>
@@ -270,8 +283,19 @@ function save(){
 
   }
     $post_id=wp_insert_post($post_data);  
-    if(!is_wp_error($post_id))
+    if(!is_wp_error($post_id)){
+        //check for upload 
+        //upload and save
+      
+        $action='bp_simple_post_new_post_'.$this->id;
+        for($i=0; $i< $this->upload_count; $i++){
+              $input_field_name=  'bp_simple_post_upload_'.$i;
+             $attachment= $this->handle_upload($post_id, $input_field_name, 'bpsfep_new_post');
+             
+        }
+        
         $message=sprintf(__('Post Saved as %s successfully.','bsfep'),$this->post_status);
+    }    
     else{
         $error=true;
         $message=__('There was a problem saving your post. Please try again later.','bsfep');
@@ -280,6 +304,15 @@ function save(){
 }
     
 bp_core_add_message($message,$error);
+}
+
+function handle_upload($post_id,$input_field_name,$action){
+        require_once( ABSPATH . 'wp-admin/includes/admin.php' );
+        $post_data=array();
+        $override=array('test_form'=>false,'action'=>$action);
+	$attachment = media_handle_upload( $input_field_name, $post_id ,$post_data,$override);
+	
+	return $attachment;
 }
 //copy of 
 //@see wp-admin/includes/template.php:wp_terms_checklist
