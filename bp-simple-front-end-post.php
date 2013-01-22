@@ -307,7 +307,11 @@ class BPSimpleBlogPostEditForm {
      * 
      */
     function load_post_form() {
-        include plugin_dir_path(__FILE__) . 'form.php';
+        
+        if(locate_template(array('feposting/form.php'),false))
+                locate_template(array('feposting/form.php'),true,false);//we may load it any no. of times
+        else
+             include (plugin_dir_path(__FILE__) . 'form.php');
     }
 
     /**
@@ -317,7 +321,7 @@ class BPSimpleBlogPostEditForm {
      * @param type $tax
      * @return array of term_ids 
      */
-    function get_tax_ids($object_ids, $tax) {
+    function get_term_ids($object_ids, $tax) {
         $terms = wp_get_object_terms($object_ids, $tax);
         $included = array();
         foreach ((array) $terms as $term)
@@ -750,7 +754,7 @@ class BPSimpleBlogPostEditForm {
         
              foreach((array)$this->tax as $tax=>$tax_options){
                     if(!empty($post_id))
-                        $tax_options['include']=$this->get_tax_ids($post_id,$tax);
+                        $tax_options['include']=$this->get_term_ids($post_id,$tax);
                     
                      $tax_options['taxonomy']=$tax;
                      $tax_options['include']=(array)$tax_options['include'];
