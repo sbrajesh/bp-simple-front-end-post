@@ -1,4 +1,6 @@
-<?php if($this->current_user_can_post ): ?>
+<?php if($this->current_user_can_post ): 
+   echo $this->post_id;
+    ?>
 
         <div class="bp-simple-post-form">
        
@@ -15,11 +17,11 @@
              <!-- you can modify these, just make sure to not change the name of the fields -->
              
              <label for="bp_simple_post_title"><?php _e('Title:','bsfep');?>
-                <input type="text" name="bp_simple_post_title"  tabindex="1" value="<?php echo $title;?>"/>
+                <input type="text" name="bp_simple_post_title"  value="<?php echo $title;?>"/>
              </label>
             
              <label for="bp_simple_post_text" ><?php _e('Post:','bsfep');?>
-                <textarea name="bp_simple_post_text" id="bp_simple_post_text" tabindex="2" ><?php echo $content; ?></textarea>
+                <textarea name="bp_simple_post_text" id="bp_simple_post_text" ><?php echo $content; ?></textarea>
              </label>
              <!--- generating the file upload box -->
             <?php if($this->upload_count):?>
@@ -35,7 +37,10 @@
             <?php endif;?>
                          
             <?php if($this->has_tax()):?>
+                <div class='simple-post-taxonomies-box clearfix'>
                 <?php $this->render_taxonomies();?>
+                    <div class="clear"></div>
+                </div>   
             <?php endif;?>   
            
             <?php //custom fields ?>

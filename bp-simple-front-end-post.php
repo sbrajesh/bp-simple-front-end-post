@@ -281,6 +281,19 @@ class BPSimpleBlogPostEditForm {
         //needed for category/term walker
         require_once(trailingslashit(ABSPATH) . 'wp-admin/includes/template.php');
         //will be exiting post for editing or 0 for new post
+        
+        //load the post form
+        
+      
+        $this->load_post_form();
+    }
+    /**
+     * Locate and load post from
+     * we need to allow theme authors to modify it
+     * so, we will first look into the template directory and if not found, we will load it from the plugin's included file
+     * 
+     */
+    function load_post_form() {
         $post_id = $this->get_post_id();
 
 
@@ -297,17 +310,6 @@ class BPSimpleBlogPostEditForm {
             $default = wp_parse_args($args, $default);
         }
         extract($default);
-        //load the post form
-        $this->load_post_form();
-    }
-    /**
-     * Locate and load post from
-     * we need to allow theme authors to modify it
-     * so, we will first look into the template directory and if not found, we will load it from the plugin's included file
-     * 
-     */
-    function load_post_form() {
-        
         if(locate_template(array('feposting/form.php'),false))
                 locate_template(array('feposting/form.php'),true,false);//we may load it any no. of times
         else
@@ -626,14 +628,14 @@ class BPSimpleBlogPostEditForm {
         extract(wp_parse_args($args, $defaults), EXTR_SKIP);
 
         if (empty($walker) || !is_a($walker, 'Walker'))
-            $walker = new SimplePostTermsChecklistWalker;//custom walker
+            $walker = new BPSimplePostTermsChecklistWalker;//custom walker
 
         $descendants_and_self = (int) $descendants_and_self;
 
         $args = array('taxonomy' => $taxonomy);
 
         $tax = get_taxonomy($taxonomy);
-        $args['disabled'] = !current_user_can($tax->cap->assign_terms);
+        $args['disabled'] =false;//allow everyone to assign the tax !current_user_can($tax->cap->assign_terms);
 
         if (is_array($selected_cats))
             $args['selected_cats'] = $selected_cats;
@@ -656,8 +658,10 @@ class BPSimpleBlogPostEditForm {
             $categories = (array) get_terms($taxonomy, array('get' => 'all', 'include' => $include));
         }
 
-        echo "<div class='simple-post-tax'>
+        echo "<div class='simple-post-tax-wrap simple-post-tax-{$taxonomy}-wrap'>
         <h3>{$tax->labels->singular_name}</h3>";
+        echo "<div class='simple-post-tax simple-post-tax-{$taxonomy}'>";
+        
         echo "<ul class='simple-post-tax-check-list'>";
 
         if ($checked_ontop) {
@@ -677,7 +681,7 @@ class BPSimpleBlogPostEditForm {
         }
         // Then the rest of them
         echo call_user_func_array(array(&$walker, 'walk'), array($categories, 0, $args));
-        echo "</ul></div>";
+        echo "</ul></div></div>";
     }
     
     /**
@@ -720,14 +724,14 @@ class BPSimpleBlogPostEditForm {
 
 
         $info = wp_dropdown_categories(array('taxonomy' => $taxonomy, 'hide_empty' => $hide_empty, 'name' => $name, 'id' => 'bp-simple-post-' . $taxonomy, 'selected' => $selected, 'show_option_all' => $show_option_all, 'echo' => false, 'excluded' => $excluded, 'hierarchical' => $hierarchical));
-
+        $html="<div class='simple-post-tax-wrap simple-post-tax-{$taxonomy}-wrap'>";
         if ($show_label)
-            $info = "<div class='simple-post-tax'><h3>{$tax->labels->singular_name}</h3>" . $info . "</div>";
-
+            $info = "<div class='simple-post-tax simple-post-tax-{$taxonomy}'><h3>{$tax->labels->singular_name}</h3>" . $info . "</div>";
+         $html=$html.$info."</div>";
         if ($echo)
-            echo $info;
+            echo $html;
         else
-            return $info;
+            return $html;
     }
     /***
      * Some utility functions for template
@@ -751,17 +755,18 @@ class BPSimpleBlogPostEditForm {
      * Generate the taxonomy dd/checkbox for template
      */
     function render_taxonomies(){
-        
+            $post_id=$this->get_post_id();
              foreach((array)$this->tax as $tax=>$tax_options){
-                    if(!empty($post_id))
-                        $tax_options['include']=$this->get_term_ids($post_id,$tax);
+                 //something is wrong here
+                  /*  if(!empty($post_id))
+                        $tax_options['include']=*/
                     
                      $tax_options['taxonomy']=$tax;
                      $tax_options['include']=(array)$tax_options['include'];
 
                     if($tax_options['view_type']&&$tax_options['view_type']=='dd'){
                             if($post_id){
-                                $tax_options['selected']=array_pop($tax_options['include']);
+                                $tax_options['selected']=$this->get_term_ids($post_id,$tax);//array_pop($tax_options['include']);
                             }
 
 
@@ -785,6 +790,7 @@ class BPSimpleBlogPostEditForm {
     
     
     function render_custom_fields(){
+        $post_id=$this->get_post_id();
         foreach($this->custom_fields as $key=>$field){
              $val=false;
 
