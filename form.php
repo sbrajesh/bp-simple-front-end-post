@@ -1,5 +1,5 @@
 <?php if($this->current_user_can_post ): 
-   echo $this->post_id;
+   
     ?>
 
         <div class="bp-simple-post-form">

@@ -248,6 +248,7 @@ class BPSimpleBlogPostEditForm {
             'tax' => false,
             'post_author' => false,
             'can_user_can_post' => false,
+            'custom_fields'=>false,
             'upload_count' => 0,
             'current_user_can_post' => is_user_logged_in() //it may be a bad decision on my part, do we really want to allow all logged in users to post?
         );
@@ -344,7 +345,7 @@ class BPSimpleBlogPostEditForm {
      * Does the saving thing
      */
     function save() {
-
+        $post_id=false;
         //verify nonce
         if (!wp_verify_nonce($_POST['_wpnonce'], 'bp_simple_post_new_post_' . $this->id)){
             bp_core_add_message(__("The Security check failed!"),'error');
@@ -359,8 +360,9 @@ class BPSimpleBlogPostEditForm {
         $content = $_POST['bp_simple_post_text'];
         $message = '';
         $error = '';
+        if(isset($_POST['post_id']))
+            $post_id = $_POST['post_id'];
         
-        $post_id = $_POST['post_id'];
         if (!empty($post_id)) {
             $post = get_post($post_id);
             //in future, we may relax this check
@@ -399,8 +401,10 @@ class BPSimpleBlogPostEditForm {
                     //tax_slug=>tax_options set for that taxonomy while registering the form
                     
                     foreach ($this->tax as $tax => $tax_options) {
+                        $selected_terms=array();
                         //get all selected terms, may be array, depends on whether a dd or checkklist
-                        $selected_terms = (array) $_POST['tax_input'][$tax]; 
+                        if(isset($_POST['tax_input'][$tax]))
+                            $selected_terms = (array) $_POST['tax_input'][$tax]; 
                         
                         //check if include is given when the form was registered and this is a subset of include
                         if (!empty($tax_options['include'])) {
@@ -762,7 +766,8 @@ class BPSimpleBlogPostEditForm {
                         $tax_options['include']=*/
                     
                      $tax_options['taxonomy']=$tax;
-                     $tax_options['include']=(array)$tax_options['include'];
+                     if(isset($tax_options['include']))
+                        $tax_options['include']=(array)$tax_options['include'];
 
                     if($tax_options['view_type']&&$tax_options['view_type']=='dd'){
                             if($post_id){
