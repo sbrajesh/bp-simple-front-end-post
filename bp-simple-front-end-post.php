@@ -376,6 +376,8 @@ class BPSimpleBlogPostEditForm {
             $message = __('Please make sure to fill the required fields', 'bsfep');
         }
 
+        $error=  apply_filters('bsfep_validate_post',$error,$_POST);
+        
         if (!$error) {
             $post_data = array(
                 'post_author' => $this->post_author,
