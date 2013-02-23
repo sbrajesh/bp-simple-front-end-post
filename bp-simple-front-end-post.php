@@ -431,7 +431,7 @@ class BPSimpleBlogPostEditForm {
 
                         //it can still be empty, if the user has not selected anything and nothing was given
                         //post to all the allowed terms
-                        if (empty($selected_terms))
+                        if (empty($selected_terms)&&isset($tax_options['include']))
                             $selected_terms = $tax_options['include']; 
 
                          
@@ -497,6 +497,10 @@ class BPSimpleBlogPostEditForm {
         //need to refactor the message/error infor data in next release when I will be modularizing the plugin a little bit more
        if(!$message)
            $message=$this->message;
+       
+       if($error)
+           $error='error';//buddypress core_add_message does not understand boolean properly
+       
         bp_core_add_message($message, $error);
     }
 
