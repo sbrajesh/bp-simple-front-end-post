@@ -895,7 +895,7 @@ function bp_get_simple_blog_post_form($name) {
 //get a referenace to a particular form instance
 function bp_get_simple_blog_post_form_by_id($form_id) {
     $editor = BPSimpleBlogPostEditor::get_instance();
-    return $editor->get_form_by_id($id);
+    return $editor->get_form_by_id($form_id);
 }
 
 BPSimpleBlogPostComponent::get_instance();
