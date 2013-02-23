@@ -304,8 +304,8 @@ class BPSimpleBlogPostEditForm {
 
 
         $default = array(
-            'title' => '',
-            'content' => ''
+            'title' => $_POST['bp_simple_post_title'],
+            'content' => $_POST['bp_simple_post_text']
         );
 
         if (!empty($post_id)) {
@@ -315,6 +315,10 @@ class BPSimpleBlogPostEditForm {
                           'content' => $post->post_content);
             $default = wp_parse_args($args, $default);
         }
+       
+       
+        
+        
         extract($default);
         if(locate_template(array('feposting/form.php'),false))
                 locate_template(array('feposting/form.php'),true,false);//we may load it any no. of times
@@ -783,7 +787,10 @@ class BPSimpleBlogPostEditForm {
                             if($post_id){
                                 $tax_options['selected']=$this->get_term_ids($post_id,$tax);//array_pop($tax_options['include']);
                             }
-
+                            elseif($_POST['tax_input'][$tax]){
+                                //if this is form submit and some taxonomies were selected
+                                $tax_options['selected']=$_POST['tax_input'][$tax];
+                            }
 
                             if(!empty($tax_options['include'])){
                                 $tax_options['show_all_terms']=0;   
@@ -791,6 +798,12 @@ class BPSimpleBlogPostEditForm {
                              
                           echo $this->list_terms_dd($tax_options);
                     }else{
+                        //for checklist
+                        
+                         if(isset($_POST['tax_input'][$tax])&&!empty($_POST['tax_input'][$tax])){
+                                //if this is form submit and some taxonomies were selected
+                                $tax_options['selected_cats']=$_POST['tax_input'][$tax];
+                            }
                         $this->wp_terms_checklist($post_id,$tax_options);
 
                     }   
