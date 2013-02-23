@@ -240,6 +240,11 @@ class BPSimpleBlogPostEditForm {
      * @param type $name
      * @param array $settings, a multidimensional array of form settings 
      */
+    /**
+     * Used to store error/success message
+     * @var string 
+     */
+    var $message='';
     public function __construct($name, $settings) {
         $this->id = md5(trim($name));
 
@@ -484,7 +489,10 @@ class BPSimpleBlogPostEditForm {
                 $message = sprintf(__('There was a problem saving your %s. Please try again later.', 'bsfep'), $post_type_details->labels->singular_name);
             }
         }
-
+        
+        //need to refactor the message/error infor data in next release when I will be modularizing the plugin a little bit more
+       if(!$message)
+           $message=$this->message;
         bp_core_add_message($message, $error);
     }
 
@@ -878,10 +886,16 @@ function bp_new_simple_blog_post_form($form_name, $settings) {
     return $form;
 }
 
-//get a referenace to a particulare form instance
+//get a referenace to a particular form instance
 function bp_get_simple_blog_post_form($name) {
     $editor = BPSimpleBlogPostEditor::get_instance();
     return $editor->get_form_by_name($name);
+}
+
+//get a referenace to a particular form instance
+function bp_get_simple_blog_post_form_by_id($form_id) {
+    $editor = BPSimpleBlogPostEditor::get_instance();
+    return $editor->get_form_by_id($id);
 }
 
 BPSimpleBlogPostComponent::get_instance();
