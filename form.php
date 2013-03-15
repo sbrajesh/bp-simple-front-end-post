@@ -51,7 +51,23 @@
             <?php echo "</div>";?>    
            <?php endif;?>     
                 
-          
+            <?php if($this->show_comment_option):?>
+                <div class="simple-post-comment-option">
+                    <h3>Allow Comments</h3>
+                    <?php $current_status=$this->comment_status;
+                        if($post_id){
+                            $post=  get_post($post_id);
+                            $current_status=$post->comment_status;
+                        }
+                   ?>
+                                    
+                        <label for="bp-simple-post-comment-status">
+                        <input id="bp-simple-post-comment-status" name="bp_simple_post_comment_status" type="checkbox" value="open" <?php echo checked('open',$current_status);?> /> Yes
+                   </label>
+                    
+                </div>   
+                
+            <?php endif;?>
                 
             <input  type="hidden" value="<?php echo $_SERVER['REQUEST_URI']; ?>" name="post_form_url"  />
 

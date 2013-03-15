@@ -236,15 +236,28 @@ class BPSimpleBlogPostEditForm {
      */
     var $upload_count = 0;
     /**
-     * Create a new instance of the Post Editor Form
-     * @param type $name
-     * @param array $settings, a multidimensional array of form settings 
+     * Default comment status, is it open or closed?
+     * @var string 
      */
+    var $comment_status='open';
+    /**
+     * Should show the user option to allow comment
+     * 
+     * @var type 
+     */
+    public $show_comment_option=true;
     /**
      * Used to store error/success message
      * @var string 
      */
     var $message='';
+    
+    /**
+     * Create a new instance of the Post Editor Form
+     * @param type $name
+     * @param array $settings, a multidimensional array of form settings 
+     */
+    
     public function __construct($name, $settings) {
         $this->id = md5(trim($name));
 
@@ -278,6 +291,11 @@ class BPSimpleBlogPostEditForm {
         $this->current_user_can_post = $current_user_can_post; //we will change later for context
 
         $this->upload_count = $upload_count;
+        if($comment_status)
+            $this->comment_status=$comment_status;
+        
+        if($show_comment_option)
+            $this->show_comment_option=$show_comment_option;
     }
 
     /**
@@ -388,6 +406,7 @@ class BPSimpleBlogPostEditForm {
         $error=  apply_filters('bsfep_validate_post',$error,$_POST);
         
         if (!$error) {
+            
             $post_data = array(
                 'post_author' => $this->post_author,
                 'post_content' => $content,
@@ -395,6 +414,14 @@ class BPSimpleBlogPostEditForm {
                 'post_status' => $this->post_status,
                 'post_title' => $title
             );
+            //find comment_status
+            $comment_status=$_POST['bp_simple_post_comment_status'];
+            if(empty($comment_status)&&!$post_id){
+                    $comment_status='closed';//user has not checked it
+            
+            }       
+            if($comment_status)
+                $post_data['comment_status']=$comment_status;
             
             if (!empty($post_id))
                 $post_data['ID'] = $post_id;
