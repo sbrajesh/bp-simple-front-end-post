@@ -35,6 +35,16 @@
                
                 </div>
             <?php endif;?>
+             <!--- generating the file upload box -->
+            <?php if($this->has_post_thumbnail):?>
+            
+                <label> <?php _e('Featured Image','bsfep');?></label>
+                
+                <div class="bp_simple_post_featured_image_input">
+                    <label><input type="file" name="bp_simple_post_upload_thumbnail" /></label>
+                
+                </div>
+            <?php endif;?>
                          
             <?php if($this->has_tax()):?>
                 <div class='simple-post-taxonomies-box clearfix'>

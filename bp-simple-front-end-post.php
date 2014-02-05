@@ -88,19 +88,21 @@ class BPSimpleBlogPostEditor {
     private $self_url;
 
     private function __construct() {
-        $this->self_url = plugin_dir_url(__FILE__);
+        $this->self_url = plugin_dir_url( __FILE__ );
 
         //hook save action to init
-        add_action('bp_ready', array($this, 'save'));
+        add_action( 'bp_ready', array( $this, 'save' ) );
     }
 
     /**
      * Factory method for singleton object
      * 
+     * @return BPSimpleBlogPostEditor
      */
-    function get_instance() {
-        if (!isset(self::$instance))
+    public static function get_instance() {
+        if ( !isset( self::$instance ) )
             self::$instance = new self();
+        
         return self::$instance;
     }
 
@@ -109,7 +111,7 @@ class BPSimpleBlogPostEditor {
      * 
      * @param BPSimpleBlogPostEditForm $form 
      */
-    public function register_form($form) {
+    public function register_form( $form ) {
         $this->forms[$form->id] = $form; //save/overwrite
     }
 
@@ -118,9 +120,9 @@ class BPSimpleBlogPostEditor {
      * @param string $form_name
      * @return BPSimpleBlogPostEditForm|boolean 
      */
-    public function get_form_by_name($form_name) {
-        $id = md5(trim($form_name));
-        return $this->get_form_by_id($id);
+    public function get_form_by_name( $form_name ) {
+        $id = md5(trim( $form_name ) );
+        return $this->get_form_by_id( $id );
     }
 
     /**
@@ -129,9 +131,9 @@ class BPSimpleBlogPostEditor {
      * @param string $form_id
      * @return BPSimpleBlogPostEditForm|boolean 
      */
-    public function get_form_by_id($form_id) {
+    public function get_form_by_id( $form_id ) {
 
-        if (isset($this->forms[$form_id]))
+        if ( isset( $this->forms[$form_id] ) )
             return $this->forms[$form_id];
         return false;
     }
@@ -144,13 +146,13 @@ class BPSimpleBlogPostEditor {
      * @return type 
      */
     function save() {
-        if (!empty($_POST['bp_simple_post_form_subimitted'])) {
+        if ( !empty($_POST['bp_simple_post_form_subimitted'] ) ) {
             //yeh form was submitted
             //get form id
             $form_id = $_POST['bp_simple_post_form_id'];
-            $form = $this->get_form_by_id($form_id);
+            $form = $this->get_form_by_id( $form_id );
 
-            if (!$form)
+            if ( !$form )
                 return; //we don't need to do anything
                 
 //so if it is a registerd form, let the form handle it
@@ -236,50 +238,57 @@ class BPSimpleBlogPostEditForm {
      */
     var $upload_count = 0;
     /**
+     * Enable/Disable support for post thumbnail
+     * @var type 
+     */
+    public $has_post_thumbnail = false;
+    /**
      * Default comment status, is it open or closed?
      * @var string 
      */
-    var $comment_status='open';
+    var $comment_status = 'open';
     /**
      * Should show the user option to allow comment
      * 
      * @var type 
      */
-    public $show_comment_option=true;
+    public $show_comment_option = true;
     /**
      * Used to store error/success message
      * @var string 
      */
-    var $message='';
+    var $message = '';
     
     /**
      * Create a new instance of the Post Editor Form
-     * @param type $name
+     * @param string $name name of the form
      * @param array $settings, a multidimensional array of form settings 
      */
     
-    public function __construct($name, $settings) {
-        $this->id = md5(trim($name));
+    public function __construct( $name, $settings ) {
+        $this->id = md5( trim( $name ) );
 
-        $default = array('post_type' => 'post',
-            'post_status' => 'draft',
-            'tax' => false,
-            'post_author' => false,
-            'can_user_can_post' => false,
-            'custom_fields'=>false,
-            'upload_count' => 0,
-            'current_user_can_post' => is_user_logged_in() //it may be a bad decision on my part, do we really want to allow all logged in users to post?
+        $default = array(
+                'post_type'             => 'post',
+                'post_status'           => 'draft',
+                'tax'                   => false,
+                'post_author'           => false,
+                'can_user_can_post'     => false,
+                'custom_fields'         => false,
+                'upload_count'          => 0,
+                'has_post_thumbnail'    => 1,
+                'current_user_can_post' => is_user_logged_in() //it may be a bad decision on my part, do we really want to allow all logged in users to post?
         );
 
-        $args = wp_parse_args($settings, $default);
-        extract($args);
+        $args = wp_parse_args( $settings, $default );
+        extract( $args );
 
         $this->post_type = $post_type;
         $this->post_status = $post_status;
 
 
 
-        if ($post_author)
+        if ( $post_author )
             $this->post_author = $post_author;
         else
             $this->post_author = get_current_user_id();
@@ -291,11 +300,12 @@ class BPSimpleBlogPostEditForm {
         $this->current_user_can_post = $current_user_can_post; //we will change later for context
 
         $this->upload_count = $upload_count;
-        if($comment_status)
-            $this->comment_status=$comment_status;
+        $this->has_post_thumbnail = $has_post_thumbnail;
+        if( $comment_status )
+            $this->comment_status = $comment_status;
         
-        if($show_comment_option)
-            $this->show_comment_option=$show_comment_option;
+        if( $show_comment_option )
+            $this->show_comment_option = $show_comment_option;
     }
 
     /**
@@ -303,7 +313,7 @@ class BPSimpleBlogPostEditForm {
      */
     function show() {
         //needed for category/term walker
-        require_once(trailingslashit(ABSPATH) . 'wp-admin/includes/template.php');
+        require_once( trailingslashit( ABSPATH ) . 'wp-admin/includes/template.php');
         //will be exiting post for editing or 0 for new post
         
         //load the post form
@@ -322,26 +332,28 @@ class BPSimpleBlogPostEditForm {
 
 
         $default = array(
-            'title' => $_POST['bp_simple_post_title'],
-            'content' => $_POST['bp_simple_post_text']
+            'title'     => $_POST['bp_simple_post_title'],
+            'content'   => $_POST['bp_simple_post_text']
         );
 
-        if (!empty($post_id)) {
+        if ( !empty( $post_id ) ) {
             //should we check if current user can edit this post ?
-            $post = get_post($post_id);
-            $args = array('title' => $post->post_title,
-                          'content' => $post->post_content);
-            $default = wp_parse_args($args, $default);
+            $post = get_post( $post_id );
+            $args = array(
+                    'title'     => $post->post_title,
+                    'content'   => $post->post_content
+                    );
+            
+            $default = wp_parse_args( $args, $default );
         }
-       
-       
         
         
-        extract($default);
-        if(locate_template(array('feposting/form.php'),false))
-                locate_template(array('feposting/form.php'),true,false);//we may load it any no. of times
+        extract( $default );
+        //think about more flexibility her
+        if( locate_template( array( 'feposting/form.php' ), false ) )
+                locate_template( array( 'feposting/form.php' ), true, false );//we may load it any no. of times
         else
-             include (plugin_dir_path(__FILE__) . 'form.php');
+             include( plugin_dir_path( __FILE__ ) . 'form.php' );
     }
 
     /**
@@ -351,12 +363,19 @@ class BPSimpleBlogPostEditForm {
      * @param type $tax
      * @return array of term_ids 
      */
-    function get_term_ids($object_ids, $tax) {
-        $terms = wp_get_object_terms($object_ids, $tax);
+    function get_term_ids( $object_ids, $tax ) {
+        
+        $terms = wp_get_object_terms( $object_ids, $tax );
         $included = array();
+        $included = wp_list_pluck( $terms, 'term_id' );
+        
+        return $included;
+        /*
         foreach ((array) $terms as $term)
             $included[] = $term->term_id;
         return $included;
+         * 
+         */
     }
 
     /**
@@ -365,92 +384,92 @@ class BPSimpleBlogPostEditForm {
      * @return type 
      */
     function get_post_id() {
-        return apply_filters('bpsp_editable_post_id', 0);
+        return apply_filters( 'bpsp_editable_post_id', 0 );
     }
 
     /**
      * Does the saving thing
      */
     function save() {
-        $post_id=false;
+        $post_id = false;
         //verify nonce
-        if (!wp_verify_nonce($_POST['_wpnonce'], 'bp_simple_post_new_post_' . $this->id)){
-            bp_core_add_message(__("The Security check failed!"),'error');
+        if ( !wp_verify_nonce( $_POST['_wpnonce'], 'bp_simple_post_new_post_' . $this->id ) ) {
+            bp_core_add_message( __( 'The Security check failed!', 'bpsfep' ),'error' );
             return;//do not proceed
             
         }
 
         
-        $post_type_details = get_post_type_object($this->post_type);
+        $post_type_details = get_post_type_object( $this->post_type );
 
         $title = $_POST['bp_simple_post_title'];
         $content = $_POST['bp_simple_post_text'];
         $message = '';
         $error = '';
-        if(isset($_POST['post_id']))
+        if( isset( $_POST['post_id'] ) )
             $post_id = $_POST['post_id'];
         
-        if (!empty($post_id)) {
-            $post = get_post($post_id);
+        if ( !empty( $post_id ) ) {
+            $post = get_post( $post_id );
             //in future, we may relax this check
-            if (!($post->post_author == get_current_user_id() || is_super_admin())) {
+            if ( !( $post->post_author == get_current_user_id() || is_super_admin() ) ) {
                 $error = true;
-                $message = __('You are not authorized for the action!', 'bsfep');
+                $message = __( 'You are not authorized for the action!', 'bsfep' );
             }
         }
-        if (empty($title) || empty($content)) {
+        if ( empty( $title ) || empty( $content ) ) {
             $error = true;
-            $message = __('Please make sure to fill the required fields', 'bsfep');
+            $message = __( 'Please make sure to fill the required fields', 'bsfep' );
         }
 
-        $error=  apply_filters('bsfep_validate_post',$error,$_POST);
+        $error=  apply_filters( 'bsfep_validate_post', $error, $_POST );
         
-        if (!$error) {
+        if ( !$error ) {
             
             $post_data = array(
-                'post_author' => $this->post_author,
-                'post_content' => $content,
-                'post_type' => $this->post_type,
-                'post_status' => $this->post_status,
-                'post_title' => $title
+                'post_author'   => $this->post_author,
+                'post_content'  => $content,
+                'post_type'     => $this->post_type,
+                'post_status'   => $this->post_status,
+                'post_title'    => $title
             );
             //find comment_status
-            $comment_status=$_POST['bp_simple_post_comment_status'];
-            if(empty($comment_status)&&!$post_id){
-                    $comment_status='closed';//user has not checked it
+            $comment_status = $_POST['bp_simple_post_comment_status'];
+            if( empty( $comment_status ) && !$post_id ) {
+                    $comment_status = 'closed';//user has not checked it
             
             }       
-            if($comment_status)
-                $post_data['comment_status']=$comment_status;
+            if( $comment_status )
+                $post_data['comment_status'] = $comment_status;
             
-            if (!empty($post_id))
+            if ( !empty( $post_id ) )
                 $post_data['ID'] = $post_id;
             //EDIT
 
-            $post_id = wp_insert_post($post_data);
+            $post_id = wp_insert_post( $post_data );
             //if everything worked fine, the post was saved
-            if (!is_wp_error($post_id)) {
+            if ( !is_wp_error( $post_id ) ) {
 
                 //update the taxonomy
                 //currently does not check if post type is associated with the taxonomy or not
                 //TODO: Make sure to check for the association of post type and category
-                if (!empty($this->tax) ) {
+                if ( !empty( $this->tax ) ) {
                     //if we have some taxonomy info
                     //tax_slug=>tax_options set for that taxonomy while registering the form
                     
-                    foreach ($this->tax as $tax => $tax_options) {
-                        $selected_terms=array();
+                    foreach ( $this->tax as $tax => $tax_options ) {
+                        $selected_terms = array();
                         //get all selected terms, may be array, depends on whether a dd or checkklist
-                        if(isset($_POST['tax_input'][$tax]))
+                        if( isset( $_POST['tax_input'][$tax] ) )
                             $selected_terms = (array) $_POST['tax_input'][$tax]; 
                         
                         //check if include is given when the form was registered and this is a subset of include
-                        if (!empty($tax_options['include'])) {
+                        if ( !empty( $tax_options['include'] ) ) {
 
                             $allowed = $tax_options['include']; //this is an array
                             //check a diff of selected vs include
-                            $is_fake = array_diff($selected_terms, $allowed);
-                            if (!empty($is_fake))
+                            $is_fake = array_diff( $selected_terms, $allowed );
+                            if ( !empty( $is_fake ) )
                                 continue; //we have fake input vales, do not store
                         }
                         
@@ -458,16 +477,16 @@ class BPSimpleBlogPostEditForm {
 
                         //it can still be empty, if the user has not selected anything and nothing was given
                         //post to all the allowed terms
-                        if (empty($selected_terms)&&isset($tax_options['include']))
+                        if ( empty( $selected_terms ) && isset( $tax_options['include'] ) )
                             $selected_terms = $tax_options['include']; 
 
                          
                         //update the taxonomy/post association
 
-                        if (!empty($selected_terms)) {
-                            $selected_terms = array_map('intval', $selected_terms);
+                        if ( !empty( $selected_terms ) ) {
+                            $selected_terms = array_map( 'intval', $selected_terms );
                            
-                                wp_set_object_terms($post_id, $selected_terms, $tax);
+                                wp_set_object_terms( $post_id, $selected_terms, $tax );
                            
                         }
                         
@@ -479,27 +498,27 @@ class BPSimpleBlogPostEditForm {
                 
                 //same strategy for the custom field as taxonomy
 
-                if (!empty($this->custom_fields)) {
+                if (!empty( $this->custom_fields ) ) {
                     //which fields were updated
                     $updated_field = (array) $_POST['custom_fields']; //array of key=>value pair
                    
-                    foreach ($this->custom_fields as $key => $data) {
+                    foreach ( $this->custom_fields as $key => $data ) {
                         
                         //shouldn't we validate the data?
-                        $value = $this->get_validated($key, $updated_field[$key], $data);
+                        $value = $this->get_validated( $key, $updated_field[$key], $data );
 
-                        if (is_array($value)) {
+                        if ( is_array( $value ) ) {
                             //there were multiple values
                             //delete older one if there is a post id
                             //it may not be a very good idea to delete old post meta field, but we don't know the field has multiple entries or single and cann mess arounf
-                            if ($post_id)
-                                delete_post_meta($post_id, $key);
+                            if ( $post_id )
+                                delete_post_meta( $post_id, $key );
 
-                            foreach ($value as $val)
-                                add_post_meta($post_id, $key, $val);
+                            foreach ( $value as $val )
+                                add_post_meta( $post_id, $key, $val );
                         }
                         else
-                            update_post_meta($post_id, $key, $value);
+                            update_post_meta( $post_id, $key, $value );
                     }
                 }//done for custom fields
                 
@@ -508,27 +527,37 @@ class BPSimpleBlogPostEditForm {
                 //upload and save
 
                 $action = 'bp_simple_post_new_post_' . $this->id;
-                for ($i = 0; $i < $this->upload_count; $i++) {
+                for ( $i = 0; $i < $this->upload_count; $i++) {
                     $input_field_name = 'bp_simple_post_upload_' . $i;
-                    $attachment = $this->handle_upload($post_id, $input_field_name, 'bpsfep_new_post');
+                    $attachment = $this->handle_upload( $post_id, $input_field_name, 'bpsfep_new_post' );
                 }
-                do_action('bsfep_post_saved', $post_id);
-                $message = sprintf(__('%s Saved as %s successfully.', 'bsfep'), $post_type_details->labels->singular_name, $this->post_status);
-                $message = apply_filters('bsfep_post_success_message', $message, $post_id, $post_type_details, $this);
+                //set post thumbnail
+                if( $this->has_post_thumbnail ){
+                    
+                    $input_field_name = 'bp_simple_post_upload_thumbnail';
+                    $attachment = $this->handle_upload( $post_id, $input_field_name, 'bpsfep_new_post' );
+                    
+                     if( $post_id && $attachment && wp_attachment_is_image( $attachment ) )
+                        set_post_thumbnail ( $post_id, $attachment );
+
+                }
+                do_action( 'bsfep_post_saved', $post_id );
+                $message = sprintf( __( '%s Saved as %s successfully.', 'bsfep' ), $post_type_details->labels->singular_name, $this->post_status );
+                $message = apply_filters( 'bsfep_post_success_message', $message, $post_id, $post_type_details, $this );
             } else {
                 $error = true;
-                $message = sprintf(__('There was a problem saving your %s. Please try again later.', 'bsfep'), $post_type_details->labels->singular_name);
+                $message = sprintf( __( 'There was a problem saving your %s. Please try again later.', 'bsfep' ), $post_type_details->labels->singular_name );
             }
         }
         
         //need to refactor the message/error infor data in next release when I will be modularizing the plugin a little bit more
-       if(!$message)
-           $message=$this->message;
+       if( !$message )
+           $message = $this->message;
        
-       if($error)
-           $error='error';//buddypress core_add_message does not understand boolean properly
+       if( $error )
+           $error = 'error';//buddypress core_add_message does not understand boolean properly
        
-        bp_core_add_message($message, $error);
+        bp_core_add_message( $message, $error );
     }
 
     /**
@@ -537,12 +566,12 @@ class BPSimpleBlogPostEditForm {
      * @param type $current_value
      * @return string 
      */
-    function render_field($field_data, $current_value=false) {
+    function render_field( $field_data, $current_value = false ) {
         extract($field_data);
         $current_value = esc_attr($current_value);
 
         $name = "custom_fields[$key]";
-        if ($type == 'checkbox')
+        if ( $type == 'checkbox')
             $name = $name . "[]";
 
         switch ($type) {
@@ -598,25 +627,25 @@ class BPSimpleBlogPostEditForm {
      * @param type $data
      * @return string 
      */
-    function get_validated($key, $value, $data) {
+    function get_validated( $key, $value, $data ) {
 
-        extract($data, EXTR_SKIP);
+        extract( $data, EXTR_SKIP );
         $sanitized = '';
 
-        switch ($type) {
+        switch ( $type ) {
             case 'textbox':
             case 'date':
             case 'textarea':
             case 'hidden':
-                $sanitized = esc_attr($value); //should we escape?   
+                $sanitized = esc_attr( $value ); //should we escape?   
                 break;
 
 
             case 'radio':
             case 'select':
 
-                foreach ($options as $option)
-                    if ($option['value'] == $value)
+                foreach ( $options as $option )
+                    if ( $option['value'] == $value )
                         $sanitized = $value;
 
                 break;
@@ -626,10 +655,10 @@ class BPSimpleBlogPostEditForm {
            //for checkbox     
             case 'checkbox':
                 $vals = array();
-                foreach ($options as $option)//how to validate
+                foreach ( $options as $option )//how to validate
                     $vals[] = $option['value'];
 
-                $sanitized = array_diff($vals, (array) $vals);
+                $sanitized = array_diff( $vals, (array) $vals );
 
                 break;
 
@@ -648,11 +677,11 @@ class BPSimpleBlogPostEditForm {
      * @param type $action
      * @return type 
      */
-    function handle_upload($post_id, $input_field_name, $action) {
+    function handle_upload( $post_id, $input_field_name, $action ) {
         require_once( ABSPATH . 'wp-admin/includes/admin.php' );
         $post_data = array();
-        $override = array('test_form' => false, 'action' => $action);
-        $attachment = media_handle_upload($input_field_name, $post_id, $post_data, $override);
+        $override = array( 'test_form' => false, 'action' => $action );
+        $attachment = media_handle_upload( $input_field_name, $post_id, $post_data, $override );
 
         return $attachment;
     }
@@ -664,7 +693,7 @@ class BPSimpleBlogPostEditForm {
      * @param type $post_id
      * @param type $args 
      */
-    function wp_terms_checklist($post_id = 0, $args = array()) {
+    function wp_terms_checklist( $post_id = 0, $args = array() ) {
         $defaults = array(
             'descendants_and_self' => 0,
             'selected_cats' => false,
@@ -674,37 +703,37 @@ class BPSimpleBlogPostEditForm {
             'taxonomy' => 'category',
             'checked_ontop' => true
         );
-        extract(wp_parse_args($args, $defaults), EXTR_SKIP);
+        extract( wp_parse_args( $args, $defaults ), EXTR_SKIP );
 
-        if (empty($walker) || !is_a($walker, 'Walker'))
-            $walker = new BPSimplePostTermsChecklistWalker;//custom walker
+        if ( empty( $walker ) || !is_a( $walker, 'Walker') )
+                $walker = new BPSimplePostTermsChecklistWalker;//custom walker
 
         $descendants_and_self = (int) $descendants_and_self;
 
         $args = array('taxonomy' => $taxonomy);
 
-        $tax = get_taxonomy($taxonomy);
-        $args['disabled'] =false;//allow everyone to assign the tax !current_user_can($tax->cap->assign_terms);
+        $tax = get_taxonomy( $taxonomy );
+        $args['disabled'] = false;//allow everyone to assign the tax !current_user_can($tax->cap->assign_terms);
 
-        if (is_array($selected_cats))
+        if ( is_array( $selected_cats ) )
             $args['selected_cats'] = $selected_cats;
-        elseif ($post_id)
-            $args['selected_cats'] = wp_get_object_terms($post_id, $taxonomy, array_merge($args, array('fields' => 'ids')));
+        elseif ( $post_id )
+            $args['selected_cats'] = wp_get_object_terms( $post_id, $taxonomy, array_merge( $args, array('fields' => 'ids' ) ) );
         else
             $args['selected_cats'] = array();
 
-        if (is_array($popular_cats))
+        if ( is_array( $popular_cats ) )
             $args['popular_cats'] = $popular_cats;
         else
-            $args['popular_cats'] = get_terms($taxonomy, array('fields' => 'ids', 'orderby' => 'count', 'order' => 'DESC', 'number' => 10, 'hierarchical' => false));
+            $args['popular_cats'] = get_terms( $taxonomy, array( 'fields' => 'ids', 'orderby' => 'count', 'order' => 'DESC', 'number' => 10, 'hierarchical' => false));
 
-        if ($descendants_and_self) {
-            $categories = (array) get_terms($taxonomy, array('child_of' => $descendants_and_self, 'hierarchical' => 0, 'hide_empty' => 0));
+        if ( $descendants_and_self ) {
+            $categories = (array) get_terms( $taxonomy, array( 'child_of' => $descendants_and_self, 'hierarchical' => 0, 'hide_empty' => 0 ) );
             $self = get_term($descendants_and_self, $taxonomy);
-            array_unshift($categories, $self);
+            array_unshift( $categories, $self );
         } else {
 
-            $categories = (array) get_terms($taxonomy, array('get' => 'all', 'include' => $include));
+            $categories = (array) get_terms( $taxonomy, array( 'get' => 'all', 'include' => $include ) );
         }
 
         echo "<div class='simple-post-tax-wrap simple-post-tax-{$taxonomy}-wrap'>
@@ -713,10 +742,10 @@ class BPSimpleBlogPostEditForm {
         
         echo "<ul class='simple-post-tax-check-list'>";
 
-        if ($checked_ontop) {
+        if ( $checked_ontop ) {
             // Post process $categories rather than adding an exclude to the get_terms() query to keep the query the same across all posts (for any query cache)
             $checked_categories = array();
-            $keys = array_keys($categories);
+            $keys = array_keys( $categories );
 
             foreach ($keys as $k) {
                 if (in_array($categories[$k]->term_id, $args['selected_cats'])) {
@@ -726,10 +755,10 @@ class BPSimpleBlogPostEditForm {
             }
 
             // Put checked cats on top
-            echo call_user_func_array(array(&$walker, 'walk'), array($checked_categories, 0, $args));
+            echo call_user_func_array( array( $walker, 'walk' ), array( $checked_categories, 0, $args ) );
         }
         // Then the rest of them
-        echo call_user_func_array(array(&$walker, 'walk'), array($categories, 0, $args));
+        echo call_user_func_array( array( $walker, 'walk' ), array( $categories, 0, $args ) );
         echo "</ul></div></div>";
     }
     
@@ -740,7 +769,7 @@ class BPSimpleBlogPostEditForm {
      * @return string 
      */
 
-    function list_terms_dd($args) {
+    function list_terms_dd( $args ) {
         $defaults = array(
             'show_option_all' => 1,
             'selected' => 0,
@@ -804,7 +833,7 @@ class BPSimpleBlogPostEditForm {
      * Generate the taxonomy dd/checkbox for template
      */
     function render_taxonomies(){
-            $post_id=$this->get_post_id();
+            $post_id = $this->get_post_id();
              foreach((array)$this->tax as $tax=>$tax_options){
                  //something is wrong here
                   /*  if(!empty($post_id))
@@ -943,4 +972,3 @@ function bp_get_simple_blog_post_form_by_id($form_id) {
 }
 
 BPSimpleBlogPostComponent::get_instance();
-?>
