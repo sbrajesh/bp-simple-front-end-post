@@ -1,11 +1,11 @@
 <?php
-
 /*
   Plugin Name: BP Simple Front End Post
   Plugin URI: http://buddydev.com/plugins/bp-simple-front-end-post/
   Description: provides the ability to create unlimited post forms and allow users to save the post from front end.It is much powerful than it looks.
   Version: 1.1.3
   Author: Brajesh Singh
+  Contributors: CreativeJuiz
   Author URI: http://buddydev.com/members/sbrajesh/
   License: GPL
  */

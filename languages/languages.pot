@@ -1,0 +1,84 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: BP Front End Post Editor\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-05-22 23:23+0100\n"
+"PO-Revision-Date: 2014-05-22 23:24+0100\n"
+"Last-Translator: Geoffrey <rikuasakura@hotmail.fr>\n"
+"Language-Team: \n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-Basepath: .\n"
+"X-Generator: Poedit 1.6.4\n"
+"X-Poedit-SearchPath-0: ..\n"
+"X-Poedit-SearchPath-1: .\n"
+
+#: ../bp-simple-front-end-post.php:397
+msgid "The Security check failed!"
+msgstr "The Security check failed!"
+
+#: ../bp-simple-front-end-post.php:417
+msgid "You are not authorized for the action!"
+msgstr "You are not authorized for the action!"
+
+#: ../bp-simple-front-end-post.php:422
+msgid "Please make sure to fill the required fields"
+msgstr "Please make sure to fill the required fields"
+
+#: ../bp-simple-front-end-post.php:545
+#, php-format
+msgid "%s Saved as %s successfully."
+msgstr "%s Saved as %s successfully."
+
+#: ../bp-simple-front-end-post.php:549
+#, php-format
+msgid "There was a problem saving your %s. Please try again later."
+msgstr "There was a problem saving your %s. Please try again later."
+
+#: ../bp-simple-front-end-post.php:795
+#, php-format
+msgid "Select %s"
+msgstr "Select %s"
+
+#: ../form.php:32
+msgid "Title"
+msgstr "Title"
+
+#: ../form.php:37
+msgid "Post"
+msgstr "Post"
+
+#: ../form.php:46
+msgid "Uploads"
+msgstr "Uploads"
+
+#: ../form.php:62
+msgid "Featured Image"
+msgstr "Featured Image"
+
+#: ../form.php:73
+msgid "Categories"
+msgstr "Categories"
+
+#: ../form.php:83
+msgid "Extra info"
+msgstr "Extra info"
+
+#: ../form.php:93
+msgid "Allow Comments"
+msgstr "Allow Comments"
+
+#: ../form.php:102
+msgid "Yes"
+msgstr "Yes"
+
+#: ../form.php:109
+msgid "Send post"
+msgstr "Send post"
+
+#, fuzzy
+#~ msgid "Post:"
+#~ msgstr "Share the post"
