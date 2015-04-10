@@ -21,7 +21,9 @@
              </label>
             
              <label for="bp_simple_post_text" ><?php _e('Post:','bsfep');?>
-                <textarea name="bp_simple_post_text" id="bp_simple_post_text" ><?php echo $content; ?></textarea>
+				 <?php wp_editor( $content, 'bp_simple_post_text', array('media_buttons'=> false, 'quicktags'=> false)) ;?>
+				 
+               <!-- <textarea name="bp_simple_post_text" id="bp_simple_post_text" ><?php echo $content; ?></textarea> -->
              </label>
              <!--- generating the file upload box -->
             <?php if($this->upload_count):?>
