@@ -34,21 +34,23 @@ class BPSimpleBlogPostComponent {
 
     private function __construct() {
 
-        add_action('bp_init', array($this, 'load_textdomain'), 2);
+        add_action( 'bp_init', array( $this, 'load_textdomain' ), 2 );
     }
 
     /**
      * Factory method for singleton object
      * 
      */
-    function get_instance() {
-        if (!isset(self::$instance))
+    public static function get_instance() {
+		
+        if ( ! isset( self::$instance ) )
             self::$instance = new self();
+		
         return self::$instance;
     }
 
     //localization
-    function load_textdomain() {
+    public function load_textdomain() {
 
 
         $locale = apply_filters('bsfep_load_textdomain_get_locale', get_locale());
@@ -65,11 +67,11 @@ class BPSimpleBlogPostComponent {
         }
     }
 
-    function include_js() {
+    public function include_js() {
         
     }
 
-    function include_css() {
+    public function include_css() {
         
     }
 
@@ -145,7 +147,7 @@ class BPSimpleBlogPostEditor {
      * 
      * @return type 
      */
-    function save() {
+    public function save() {
         if ( !empty($_POST['bp_simple_post_form_subimitted'] ) ) {
             //yeh form was submitted
             //get form id
@@ -332,8 +334,8 @@ class BPSimpleBlogPostEditForm {
 
 
         $default = array(
-            'title'     => $_POST['bp_simple_post_title'],
-            'content'   => $_POST['bp_simple_post_text']
+            'title'     => isset( $_POST['bp_simple_post_title'] ) ? $_POST['bp_simple_post_title'] : '',
+            'content'   => isset( $_POST['bp_simple_post_text'] )? $_POST['bp_simple_post_text'] : ''
         );
 
         if ( !empty( $post_id ) ) {
@@ -924,7 +926,7 @@ class BPSimplePostTermsChecklistWalker extends Walker {
         $output .= "$indent</ul>\n";
     }
 
-    function start_el(&$output, $category, $depth, $args, $id = 0) {
+    function start_el(&$output, $category, $depth = 0, $args = array(), $id = 0) {
         extract($args);
         if (empty($taxonomy))
             $taxonomy = 'category';
