@@ -9,8 +9,9 @@
 class BPSimpleBlogPostEditor {
 
     private static $instance;
-    var $forms = array(); // array of Post Forms(multiple post forms)
-    private $self_url;
+    private $forms = array(); // array of Post Forms(multiple post forms)
+    
+	private $self_url;
 
     private function __construct() {
         $this->self_url = plugin_dir_url( __FILE__ );
@@ -25,8 +26,11 @@ class BPSimpleBlogPostEditor {
      * @return BPSimpleBlogPostEditor
      */
     public static function get_instance() {
-        if ( !isset( self::$instance ) )
-            self::$instance = new self();
+		
+        if ( ! isset( self::$instance ) ) {
+         
+			self::$instance = new self();
+		}	
         
         return self::$instance;
     }
@@ -37,6 +41,7 @@ class BPSimpleBlogPostEditor {
      * @param BPSimpleBlogPostEditForm $form 
      */
     public function register_form( $form ) {
+		
         $this->forms[$form->id] = $form; //save/overwrite
     }
 
@@ -46,8 +51,10 @@ class BPSimpleBlogPostEditor {
      * @return BPSimpleBlogPostEditForm|boolean 
      */
     public function get_form_by_name( $form_name ) {
+		
         $id = md5(trim( $form_name ) );
-        return $this->get_form_by_id( $id );
+        
+		return $this->get_form_by_id( $id );
     }
 
     /**
@@ -58,8 +65,11 @@ class BPSimpleBlogPostEditor {
      */
     public function get_form_by_id( $form_id ) {
 
-        if ( isset( $this->forms[$form_id] ) )
-            return $this->forms[$form_id];
+        if ( isset( $this->forms[$form_id] ) ) {
+         
+			return $this->forms[$form_id];
+		}	
+		
         return false;
     }
 
@@ -71,15 +81,16 @@ class BPSimpleBlogPostEditor {
      * @return type 
      */
     public function save() {
-        if ( !empty($_POST['bp_simple_post_form_subimitted'] ) ) {
+        
+		if ( ! empty( $_POST['bp_simple_post_form_subimitted'] ) ) {
             //yeh form was submitted
             //get form id
             $form_id = $_POST['bp_simple_post_form_id'];
             $form = $this->get_form_by_id( $form_id );
 
-            if ( !$form )
+            if ( ! $form ) {
                 return; //we don't need to do anything
-                
+			}    
 //so if it is a registerd form, let the form handle it
 
             $form->save(); //save the post and redirect properly
