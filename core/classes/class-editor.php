@@ -11,11 +11,8 @@ class BPSimpleBlogPostEditor {
     private static $instance;
     private $forms = array(); // array of Post Forms(multiple post forms)
     
-	private $self_url;
-
     private function __construct() {
-        $this->self_url = plugin_dir_url( __FILE__ );
-
+        
         //hook save action to init
         add_action( 'bp_ready', array( $this, 'save' ) );
     }
@@ -42,7 +39,7 @@ class BPSimpleBlogPostEditor {
      */
     public function register_form( $form ) {
 		
-        $this->forms[$form->id] = $form; //save/overwrite
+        $this->forms[$form->get_id()] = $form; //save/overwrite
     }
 
     /**

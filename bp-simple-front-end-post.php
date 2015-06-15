@@ -4,7 +4,7 @@
   Plugin Name: BP Simple Front End Post
   Plugin URI: http://buddydev.com/plugins/bp-simple-front-end-post/
   Description: provides the ability to create unlimited post forms and allow users to save the post from front end.It is much powerful than it looks.
-  Version: 1.1.3
+  Version: 1.2
   Author: Brajesh Singh
   Author URI: http://buddydev.com/members/sbrajesh/
   License: GPL
@@ -32,9 +32,12 @@ class BPSimpleBlogPostComponent {
 
     private static $instance;
 
+	private $path = '';
     private function __construct() {
-
-        add_action( 'bp_init', array( $this, 'load_textdomain' ), 2 );
+		
+		$this->path = plugin_dir_path( __FILE__ );
+        
+		add_action( 'bp_init', array( $this, 'load_textdomain' ), 2 );
 		add_action( 'plugins_loaded', array( $this, 'load' ) );
     }
 
@@ -52,7 +55,7 @@ class BPSimpleBlogPostComponent {
 
 	public function load() {
 		
-		$path = plugin_dir_path( __FILE__ );
+		$path = $this->path;
 		
 		$files = array(
 			'core/classes/class-terms-checklist-walker.php',
@@ -95,10 +98,25 @@ class BPSimpleBlogPostComponent {
     public function include_css() {
         
     }
+	/**
+	 * Get file system path of this plugin directory
+	 * 
+	 * @return type
+	 */
+	public function get_path() {
+		
+		return $this->path;
+	}
 
 }
 
 
-
-
+/**
+ * get singleton instance
+ * 
+ * @return BPSimpleBlogPostComponent
+ */
+function bp_simple_blog_post_helper() {
+	return BPSimpleBlogPostComponent::get_instance();
+}
 BPSimpleBlogPostComponent::get_instance();

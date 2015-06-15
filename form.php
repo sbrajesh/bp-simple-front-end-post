@@ -1,6 +1,4 @@
-<?php if($this->current_user_can_post ): 
-   
-    ?>
+<?php if( $this->current_user_can_post ): ?>
 
         <div class="bp-simple-post-form">
        
@@ -9,8 +7,10 @@
             <!-- do not modify/remove the line blow -->
             <input type="hidden" name="bp_simple_post_form_id" value="<?php echo $this->id;?>" />
             <?php wp_nonce_field( 'bp_simple_post_new_post_'.$this->id ); ?>
-            <input type="hidden" name="action" value="bp_simple_post_new_post_<?php echo $this->id;?>" />
-            <?php if($post_id):?>
+            
+			<input type="hidden" name="action" value="bp_simple_post_new_post_<?php echo $this->id;?>" />
+            
+				<?php if($post_id):?>
                 <input type="hidden" name="post_id" value="<?php echo $post_id;?>" />
             <?php endif;?>
                     
@@ -26,7 +26,7 @@
                <!-- <textarea name="bp_simple_post_text" id="bp_simple_post_text" ><?php echo $content; ?></textarea> -->
              </label>
              <!--- generating the file upload box -->
-            <?php if($this->upload_count):?>
+            <?php if( $this->upload_count ):?>
             
                 <label> <?php _e('Uploads','bsfep');?></label>
                 
@@ -38,7 +38,7 @@
                 </div>
             <?php endif;?>
              <!--- generating the file upload box -->
-            <?php if($this->has_post_thumbnail):?>
+            <?php if( $this->has_post_thumbnail ): ?>
             
                 <label> <?php _e('Featured Image','bsfep');?></label>
                 
@@ -48,7 +48,7 @@
                 </div>
             <?php endif;?>
                          
-            <?php if($this->has_tax()):?>
+            <?php if( $this->has_tax() ):?>
                 <div class='simple-post-taxonomies-box clearfix'>
                 <?php $this->render_taxonomies();?>
                     <div class="clear"></div>
@@ -58,14 +58,16 @@
             <?php //custom fields ?>
            <?php if($this->has_custom_fields()):?>
            <?php echo "<div class='simple-post-custom-fields'>";?>     
-                <h3>Extra Info</h3>
+                <?php if( $this->has_visible_meta() ):?>
+					<h3><?php echo $this->custom_field_title;?></h3>
+				<?php endif;?>
                    <?php $this->render_custom_fields();?>
             <?php echo "</div>";?>    
            <?php endif;?>     
                 
             <?php if($this->show_comment_option):?>
                 <div class="simple-post-comment-option">
-                    <h3>Allow Comments</h3>
+                    <h4>Allow Comments</h4>
                     <?php $current_status=$this->comment_status;
                         if($post_id){
                             $post=  get_post($post_id);
