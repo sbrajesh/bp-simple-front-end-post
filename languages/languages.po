@@ -2,44 +2,67 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BP Front End Post Editor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-01 19:38+0530\n"
-"PO-Revision-Date: 2011-12-01 19:38+0530\n"
-"Last-Translator: Brajesh Singh <brajesh@gmail.com>\n"
+"POT-Creation-Date: 2015-08-04 16:03+0530\n"
+"PO-Revision-Date: 2015-08-04 16:03+0530\n"
+"Last-Translator: Brajesh Singh\n"
 "Language-Team: \n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: __;_e\n"
 "X-Poedit-Basepath: .\n"
-"X-Poedit-SearchPath-0: /var/www/bp/1.5/dev/wp-content/plugins/bp-simple-front-end-post\n"
+"X-Generator: Poedit 1.5.4\n"
+"X-Poedit-SearchPath-0: /var/www/bp/2.3/dev/wp-content/plugins/bp-simple-"
+"front-end-post\n"
 
-#: /var/www/bp/1.5/dev/wp-content/plugins/bp-simple-front-end-post/bp-simple-front-end-post.php:207
+#: /var/www/bp/2.3/dev/wp-content/plugins/bp-simple-front-end-post/form.php:19
 msgid "Title:"
 msgstr ""
 
-#: /var/www/bp/1.5/dev/wp-content/plugins/bp-simple-front-end-post/bp-simple-front-end-post.php:211
+#: /var/www/bp/2.3/dev/wp-content/plugins/bp-simple-front-end-post/form.php:23
 msgid "Post:"
 msgstr ""
 
-#: /var/www/bp/1.5/dev/wp-content/plugins/bp-simple-front-end-post/bp-simple-front-end-post.php:217
-msgid "Category:"
+#: /var/www/bp/2.3/dev/wp-content/plugins/bp-simple-front-end-post/form.php:31
+msgid "Uploads"
 msgstr ""
 
-#: /var/www/bp/1.5/dev/wp-content/plugins/bp-simple-front-end-post/bp-simple-front-end-post.php:228
+#: /var/www/bp/2.3/dev/wp-content/plugins/bp-simple-front-end-post/form.php:43
+msgid "Featured Image"
+msgstr ""
+
+#: /var/www/bp/2.3/dev/wp-content/plugins/bp-simple-front-end-post/form.php:88
 msgid "Post"
 msgstr ""
 
-#: /var/www/bp/1.5/dev/wp-content/plugins/bp-simple-front-end-post/bp-simple-front-end-post.php:251
+#: /var/www/bp/2.3/dev/wp-content/plugins/bp-simple-front-end-post/core/classes/class-edit-form.php:256
+msgid "The Security check failed!"
+msgstr ""
+
+#: /var/www/bp/2.3/dev/wp-content/plugins/bp-simple-front-end-post/core/classes/class-edit-form.php:282
+msgid "You are not authorized for the action!"
+msgstr ""
+
+#: /var/www/bp/2.3/dev/wp-content/plugins/bp-simple-front-end-post/core/classes/class-edit-form.php:291
 msgid "Please make sure to fill the required fields"
 msgstr ""
 
-#: /var/www/bp/1.5/dev/wp-content/plugins/bp-simple-front-end-post/bp-simple-front-end-post.php:274
+#: /var/www/bp/2.3/dev/wp-content/plugins/bp-simple-front-end-post/core/classes/class-edit-form.php:436
 #, php-format
-msgid "Post Saved as %s successfully."
+msgid "%s saved and published successfully."
 msgstr ""
 
-#: /var/www/bp/1.5/dev/wp-content/plugins/bp-simple-front-end-post/bp-simple-front-end-post.php:277
-msgid "There was a problem saving your post. Please try again later."
+#: /var/www/bp/2.3/dev/wp-content/plugins/bp-simple-front-end-post/core/classes/class-edit-form.php:440
+#, php-format
+msgid "%s saved as %s successfully."
 msgstr ""
 
+#: /var/www/bp/2.3/dev/wp-content/plugins/bp-simple-front-end-post/core/classes/class-edit-form.php:460
+#, php-format
+msgid "There was a problem saving your %s. Please try again later."
+msgstr ""
+
+#: /var/www/bp/2.3/dev/wp-content/plugins/bp-simple-front-end-post/core/classes/class-edit-form.php:784
+#, php-format
+msgid "Select %s"
+msgstr ""
