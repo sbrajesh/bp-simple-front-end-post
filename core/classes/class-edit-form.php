@@ -95,8 +95,13 @@ class BPSimpleBlogPostEditForm {
      * Used to store error/success message
      * @var string 
      */
-    var $message = '';
-    
+    public $message = '';
+    /**
+	 * If given, this gets called after updating/saving post
+	 * 
+	 * @var callable 
+	 */
+	private $update_callback = null;
     /**
      * Create a new instance of the Post Editor Form
      * @param string $name name of the form
@@ -154,7 +159,11 @@ class BPSimpleBlogPostEditForm {
 		
         if( isset( $show_comment_option ) ) {
             $this->show_comment_option = $show_comment_option;
-		}	
+		}
+		//is update callback given?
+		if( isset( $update_callback ) ) {
+			$this->update_callback = $update_callback;
+		}
     }
 
     /**
@@ -256,6 +265,8 @@ class BPSimpleBlogPostEditForm {
         $message	= '';
         $error		= '';
 		
+		$is_new = true;
+		
         if( isset( $_POST['post_id'] ) ) {
          
 			$post_id = $_POST['post_id'];
@@ -271,6 +282,7 @@ class BPSimpleBlogPostEditForm {
                 $message = __( 'You are not authorized for the action!', 'bsfep' );
             }
 			
+			$is_new = false; //this is an update of existing post
         }
 		
         if ( empty( $title ) || empty( $content ) ) {
@@ -419,10 +431,28 @@ class BPSimpleBlogPostEditForm {
 
                 }
 				
-                do_action( 'bsfep_post_saved', $post_id );
+				if( get_post_status( $post_id ) == 'publish' ) {
+					
+					$message =  sprintf( __( '%s saved and published successfully.', 'bsfep' ), $post_type_details->labels->singular_name );
+					
+				} else {
 				
-                $message = sprintf( __( '%s Saved as %s successfully.', 'bsfep' ), $post_type_details->labels->singular_name, $this->post_status );
-                $message = apply_filters( 'bsfep_post_success_message', $message, $post_id, $post_type_details, $this );
+					$message = sprintf( __( '%s saved as %s successfully.', 'bsfep' ), $post_type_details->labels->singular_name, $this->post_status );
+                
+				}
+				
+				$message = apply_filters( 'bsfep_post_success_message', $message, $post_id, $post_type_details, $this );
+				 
+				bp_core_add_message( $message, $error );
+				
+				 
+				do_action( 'bsfep_post_saved', $post_id, $is_new );
+				 
+				if( ! empty( $this->update_callback ) && is_callable( $this->update_callback ) ) {
+					call_user_func( $this->update_callback, $post_id, $is_new, $this );
+				}
+				
+				return ;
 				
             } else {
                 
