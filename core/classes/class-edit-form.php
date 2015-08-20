@@ -652,11 +652,12 @@ class BPSimpleBlogPostEditForm {
             'walker'				=> null,
             'include'				=> array(),
             'taxonomy'				=> 'category',
-            'checked_ontop'			=> true
-        );
+            'checked_ontop'			=> true,
+			);
 		
         extract( wp_parse_args( $args, $defaults ), EXTR_SKIP );
 
+		
         if ( empty( $walker ) || ! is_a( $walker, 'Walker') ) {
          
 			$walker = new BPSimplePostTermsChecklistWalker;//custom walker
@@ -754,7 +755,8 @@ class BPSimpleBlogPostEditForm {
             'include'			=> false,
             'hierarchical'		=> true,
             'select_label'		=> false,
-            'show_label'		=> true
+            'show_label'		=> true,
+			'child_of'			=> false,
         );
 		
         $args = wp_parse_args( $args, $defaults );
@@ -805,7 +807,8 @@ class BPSimpleBlogPostEditForm {
 			'show_option_all'	=> $show_option_all,
 			'echo'				=> false,
 			'excluded'			=> $excluded,
-			'hierarchical'		=> $hierarchical
+			'hierarchical'		=> $hierarchical,
+			'child_of'			=> $child_of
 		) );
 		
         $html = "<div class='simple-post-tax-wrap simple-post-tax-{$taxonomy}-wrap'>";
@@ -843,7 +846,7 @@ class BPSimpleBlogPostEditForm {
 		
         return false;
     }
-    
+
 	/**
 	 * Does this form has custom fields
 	 * 
@@ -904,7 +907,7 @@ class BPSimpleBlogPostEditForm {
 
 					$tax_options['selected'] = $this->get_term_ids( $post_id, $tax );//array_pop($tax_options['include']);
 
-				}elseif( $_POST['tax_input'][$tax] ) {
+				}elseif( isset( $_POST['tax_input'][$tax] ) ) {
 
 					//if this is form submit and some taxonomies were selected
 					$tax_options['selected'] = $_POST['tax_input'][$tax];
@@ -914,7 +917,8 @@ class BPSimpleBlogPostEditForm {
 
 					$tax_options['show_all_terms'] = 0;   
 				}
-
+				
+				
 				echo $this->list_terms_dd( $tax_options );
 
 			} else {
@@ -925,7 +929,9 @@ class BPSimpleBlogPostEditForm {
 					$tax_options['selected_cats'] = $_POST['tax_input'][$tax];
 
 				}
-
+				if( isset( $tax_options['child_of'] ) ) {
+					$tax_options['descendants_and_self'] = $tax_options['child_of'];
+				}
 				$this->wp_terms_checklist( $post_id, $tax_options );
 
 			}   
