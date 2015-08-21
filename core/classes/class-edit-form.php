@@ -757,6 +757,8 @@ class BPSimpleBlogPostEditForm {
             'select_label'		=> false,
             'show_label'		=> true,
 			'child_of'			=> false,
+			'orderby'			=> 'ID',
+			'order'				=> 'ASC',
         );
 		
         $args = wp_parse_args( $args, $defaults );
@@ -808,7 +810,9 @@ class BPSimpleBlogPostEditForm {
 			'echo'				=> false,
 			'excluded'			=> $excluded,
 			'hierarchical'		=> $hierarchical,
-			'child_of'			=> $child_of
+			'child_of'			=> $child_of,
+			'orderby'			=> $orderby,
+			'order'				=> $order,
 		) );
 		
         $html = "<div class='simple-post-tax-wrap simple-post-tax-{$taxonomy}-wrap'>";
