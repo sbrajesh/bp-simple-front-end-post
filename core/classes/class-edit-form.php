@@ -540,6 +540,11 @@ class BPSimpleBlogPostEditForm {
                 $input = "<label>{$label}<input type='text' class='bp-simple-front-end-post-date'  id='custom-field-{$key}' name='{$name}' value='{$current_value}' /></label>";
                 
 				break;
+            case 'url':
+				
+                $input = "<label>{$label}<input type='text' class='bp-simple-front-end-post-url'  id='custom-field-{$key}' name='{$name}' value='{$current_value}' /></label>";
+                
+				break;
 			
             case 'hidden':
 				
@@ -607,7 +612,13 @@ class BPSimpleBlogPostEditForm {
 
                 break;
 
-
+			case 'url':	
+				$sanitized = esc_url( $value );
+				break;
+			
+			case 'number':	
+				$sanitized = intval( $value );
+				break;
             default:
 				
                 $sanitized = '';
