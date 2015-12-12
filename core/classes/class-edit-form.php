@@ -8,7 +8,7 @@
 class BPSimpleBlogPostEditForm {
 
   /**
-   * A unique md5'd id of the post form
+   * A unique md5 hashed id of the post form
    * Each post form has a unique id
    * an unique md5ed hash of the human readable name
    * 
@@ -68,7 +68,8 @@ class BPSimpleBlogPostEditForm {
      * 
      * @todo: we need to finetune it for allowed media types?
      *
-     *  @var type 
+     *  @var type
+	 *  @deprecated 1.2.5 
      */
     protected $upload_count = 0;
 	
@@ -108,22 +109,33 @@ class BPSimpleBlogPostEditForm {
      * @param array $settings, a multidimensional array of form settings 
      */
     
+	/**
+	 * Whether to allow upload or not?
+	 * Uses the WordPress media Uploader for uploads 
+	 * 
+	 * @since 1.2.5
+	 * 
+	 * @var type 
+	 */
+	protected $allow_upload = false;
+	
     public function __construct( $name, $settings ) {
 		
         $this->id = md5( trim( $name ) );
 
         $default = array(
-                'post_type'             => 'post',
-                'post_status'           => 'draft',
-                'tax'                   => false,
-                'post_author'           => false,
-                'can_user_can_post'     => false,
-                'custom_fields'         => false,
-                'upload_count'          => 0,
-                'has_post_thumbnail'    => 1,
-				'show_comment_option'	=> $this->show_comment_option,
-				'comment_status'		=> $this->comment_status,
-                'current_user_can_post' => is_user_logged_in() //it may be a bad decision on my part, do we really want to allow all logged in users to post?
+			'post_type'             => 'post',
+			'post_status'           => 'draft',
+			'tax'                   => false,
+			'post_author'           => false,
+			'can_user_can_post'     => false,
+			'custom_fields'         => false,
+			'upload_count'          => 0,
+			'has_post_thumbnail'    => 1,
+			'show_comment_option'	=> $this->show_comment_option,
+			'comment_status'		=> $this->comment_status,
+			'current_user_can_post' => is_user_logged_in(), //it may be a bad decision on my part, do we really want to allow all logged in users to post?
+			'allow_upload'			=> false,
         );
 
         $args = wp_parse_args( $settings, $default );
@@ -132,8 +144,7 @@ class BPSimpleBlogPostEditForm {
         $this->post_type	= $post_type;
         $this->post_status	= $post_status;
 
-
-
+		//if the author id is given
         if ( $post_author ) {
          
 			$this->post_author = $post_author;
@@ -142,26 +153,35 @@ class BPSimpleBlogPostEditForm {
 			
 			 $this->post_author = get_current_user_id();
 		}
-		
+		//we will process the taxonomy & meta later
         $this->tax = $tax;
 
         $this->custom_fields = $custom_fields;
 
         $this->current_user_can_post = $current_user_can_post; //we will change later for context
 		
+		//upload count is deprecated, use allow_upload instead 
         $this->upload_count			= $upload_count;
+		
         $this->has_post_thumbnail	= $has_post_thumbnail;
 		
-        if( $comment_status ) {
+		$this->allow_upload = $allow_upload;
+		
+		//back compat
+		if ( !  $this->allow_upload && $this->upload_count ) {
+			$this->allow_upload = true;
+		}
+		
+        if ( $comment_status ) {
 			
 			$this->comment_status = $comment_status;
 		}
 		
-        if( isset( $show_comment_option ) ) {
+        if ( isset( $show_comment_option ) ) {
             $this->show_comment_option = $show_comment_option;
 		}
 		//is update callback given?
-		if( isset( $update_callback ) ) {
+		if ( isset( $update_callback ) ) {
 			$this->update_callback = $update_callback;
 		}
     }
@@ -170,8 +190,10 @@ class BPSimpleBlogPostEditForm {
      * Show/Render the Post form
      */
     public function show() {
-		if( ! $this->current_user_can_post )
+		
+		if ( ! $this->current_user_can_post ) {
 			return ;
+		}
 		
         //needed for category/term walker
         require_once( trailingslashit( ABSPATH ) . 'wp-admin/includes/template.php');
@@ -853,13 +875,11 @@ class BPSimpleBlogPostEditForm {
      */
     public function has_tax() {
 		
-        if( ! empty( $this->tax ) && is_array( $this->tax ) ) {
-         
-			return true;
-			
+        if ( ! empty( $this->tax ) && is_array( $this->tax ) ) {
+         	return true;
 		}
 		
-        return false;
+		return false;
     }
 
 	/**
@@ -869,27 +889,25 @@ class BPSimpleBlogPostEditForm {
 	 */
     public function has_custom_fields() {
 		
-        if( ! empty( $this->custom_fields ) ) {
-         
+        if ( ! empty( $this->custom_fields ) ) {
 			return true;
-			
-		}		 
-        
+		}
+		
 		return false;
     }
 	
 	public function has_visible_meta() {
 		
-		if( ! is_null( $this->has_visisible_meta ) )
+		if ( ! is_null( $this->has_visisible_meta ) ) {
 			return $this->has_visisible_meta;
+		}
 		//check 
 		$fields = $this->custom_fields; 
-		
 		$this->has_visible_meta = false;
 		
-		foreach( $fields as $field ) {
+		foreach ( $fields as $field ) {
 			
-			if( $field['type'] != 'hidden' ) {
+			if ( $field['type'] != 'hidden' ) {
 				$this->has_visisible_meta = true;
 				break;
 			}
@@ -1005,7 +1023,20 @@ class BPSimpleBlogPostEditForm {
 		return $this->id;
 	}
 	
+	/**
+	 * Gte teh post type associated with this form
+	 * 
+	 * @return type
+	 */
 	public function get_post_type() {
 		return $this->post_type;
+	}
+	
+	/**
+	 * Is the upload enabled?
+	 * @return boolean true if enabled else false
+	 */
+	public function has_upload_enabled() {
+		return $this->allow_upload;
 	}
 }

@@ -37,8 +37,7 @@ class BPSimpleBlogPostComponent {
 		
 		$this->path = plugin_dir_path( __FILE__ );
         
-		add_action( 'bp_init', array( $this, 'load_textdomain' ), 2 );
-		add_action( 'plugins_loaded', array( $this, 'load' ) );
+		$this->setup();
     }
 
     /**
@@ -52,6 +51,17 @@ class BPSimpleBlogPostComponent {
 		
         return self::$instance;
     }
+	
+	public function setup() {
+		
+		add_action( 'bp_init', array( $this, 'load_textdomain' ), 2 );
+		add_action( 'plugins_loaded', array( $this, 'load' ) );
+		
+		add_filter( 'user_has_cap', array( $this, 'add_upload_cap_filter' ), 10, 3 );
+		add_filter( 'ajax_query_attachments_args', array( $this, 'filter_ajax_attachment_args' ) );
+
+		
+	}
 
 	public function load() {
 		
@@ -64,9 +74,9 @@ class BPSimpleBlogPostComponent {
 			'core/functions.php',
 		);
 		
-		if( is_admin() )
-			return ;//we don't need these in admin
-		
+		if( is_admin() ) {
+		//	return ;//we don't need these in admin
+		}
 		foreach( $files as $file ) {
 			
 			require_once $path . $file ;
@@ -91,6 +101,57 @@ class BPSimpleBlogPostComponent {
         }
     }
 
+	/**
+	 * 
+	 * @return boolean
+	 */
+	public function enable_upload_filters() {
+	
+		$apply = function_exists('is_buddypress') && is_buddypress();
+
+		$apply = apply_filters( 'bsfep_enable_upload_filters', $apply );
+		
+		return $apply;
+	}
+	
+	public function add_upload_cap_filter( $allcaps, $cap, $args ) {
+
+		if ( $args[0] !== 'upload_files' ) {
+			return $allcaps;
+		}
+		
+		if ( ! $this->enable_upload_filters() ) {
+			return $allcaps;
+		}
+		
+		$allcaps[ $cap[0] ] = true;
+		
+
+		return $allcaps;
+
+	}
+	
+	/**
+	 * Filter attachment for current user
+
+	 * @param type $args
+	 * @return type
+	 */
+	public function filter_ajax_attachment_args( $args ) {
+
+		if( ! $this->enable_upload_filters() ) {
+			return $args;
+		}
+		
+		
+		if ( is_user_logged_in() ) {
+			$args['author'] = get_current_user_id();
+		}
+
+		return $args;
+	}
+
+	
     public function include_js() {
         
     }
