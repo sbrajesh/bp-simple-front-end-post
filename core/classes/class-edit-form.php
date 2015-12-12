@@ -196,7 +196,7 @@ class BPSimpleBlogPostEditForm {
 		}
 		
         //needed for category/term walker
-        require_once( trailingslashit( ABSPATH ) . 'wp-admin/includes/template.php');
+        require_once( trailingslashit( ABSPATH ) . 'wp-admin/includes/template.php' );
         //will be exiting post for editing or 0 for new post
         
 		$this->load_post_form();
@@ -232,10 +232,11 @@ class BPSimpleBlogPostEditForm {
         
         extract( $default );
         //think about more flexibility her
-        if( locate_template( array( 'feposting/form.php' ), false ) )
+        if ( locate_template( array( 'feposting/form.php' ), false ) ) {
                 locate_template( array( 'feposting/form.php' ), true, false );//we may load it any no. of times
-        else
+		} else {
              include bp_simple_blog_post_helper ( )->get_path () . 'form.php' ;
+		}
     }
 
     /**
@@ -248,6 +249,7 @@ class BPSimpleBlogPostEditForm {
     protected function get_term_ids( $object_ids, $tax ) {
         
         $terms = wp_get_object_terms( $object_ids, $tax );
+		
         $included = array();
         $included = wp_list_pluck( $terms, 'term_id' );
         
@@ -289,7 +291,7 @@ class BPSimpleBlogPostEditForm {
 		
 		$is_new = true;
 		
-        if( isset( $_POST['post_id'] ) ) {
+        if ( isset( $_POST['post_id'] ) ) {
          
 			$post_id = $_POST['post_id'];
 			
@@ -399,7 +401,7 @@ class BPSimpleBlogPostEditForm {
                 
                 //same strategy for the custom field as taxonomy
 
-                if (! empty( $this->custom_fields ) ) {
+                if ( ! empty( $this->custom_fields ) ) {
                     //which fields were updated
                     $updated_field = (array) $_POST['custom_fields']; //array of key=>value pair
                    
@@ -433,13 +435,8 @@ class BPSimpleBlogPostEditForm {
                 //upload and save
 
                 $action = 'bp_simple_post_new_post_' . $this->id;
-				
-                for ( $i = 0; $i < $this->upload_count; $i++ ) {
-					
-                    $input_field_name = 'bp_simple_post_upload_' . $i;
-                    $attachment = $this->handle_upload( $post_id, $input_field_name, 'bpsfep_new_post' );
-					
-                }
+			
+
                 //set post thumbnail
                 if ( $this->has_post_thumbnail ) {
                     
@@ -922,7 +919,7 @@ class BPSimpleBlogPostEditForm {
 		
 		$post_id = $this->get_post_id();
 
-		foreach( (array) $this->tax as $tax => $tax_options ) {
+		foreach ( (array) $this->tax as $tax => $tax_options ) {
 
 			 //something is wrong here
 			  /*  if(!empty($post_id))
@@ -940,13 +937,13 @@ class BPSimpleBlogPostEditForm {
 
 					$tax_options['selected'] = $this->get_term_ids( $post_id, $tax );//array_pop($tax_options['include']);
 
-				}elseif( isset( $_POST['tax_input'][$tax] ) ) {
+				} elseif ( isset( $_POST['tax_input'][ $tax ] ) ) {
 
 					//if this is form submit and some taxonomies were selected
-					$tax_options['selected'] = $_POST['tax_input'][$tax];
+					$tax_options['selected'] = $_POST['tax_input'][ $tax ];
 				}
 
-				if( ! empty( $tax_options['include'] ) ) {
+				if ( ! empty( $tax_options['include'] ) ) {
 
 					$tax_options['show_all_terms'] = 0;   
 				}
@@ -957,14 +954,16 @@ class BPSimpleBlogPostEditForm {
 			} else {
 			//for checklist
 
-				if( isset( $_POST['tax_input'][$tax] ) && ! empty( $_POST['tax_input'][$tax] ) ) {
+				if ( isset( $_POST['tax_input'][ $tax ] ) && ! empty( $_POST['tax_input'][ $tax ] ) ) {
 						//if this is form submit and some taxonomies were selected
 					$tax_options['selected_cats'] = $_POST['tax_input'][$tax];
 
 				}
-				if( isset( $tax_options['child_of'] ) ) {
+				
+				if ( isset( $tax_options['child_of'] ) ) {
 					$tax_options['descendants_and_self'] = $tax_options['child_of'];
 				}
+				
 				$this->wp_terms_checklist( $post_id, $tax_options );
 
 			}   

@@ -41,6 +41,8 @@ function bp_get_simple_blog_post_form( $name ) {
  * @return BPSimpleBlogPostEditForm
  */
 function bp_get_simple_blog_post_form_by_id( $form_id ) {
+	
     $editor = BPSimpleBlogPostEditor::get_instance();
-    return $editor->get_form_by_id($form_id);
+	
+    return $editor->get_form_by_id( $form_id );
 }
