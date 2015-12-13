@@ -4,7 +4,7 @@
   Plugin Name: BP Simple Front End Post
   Plugin URI: http://buddydev.com/plugins/bp-simple-front-end-post/
   Description: Provides the ability to create unlimited post forms and allow users to save the post from front end.It is much powerful than it looks.
-  Version: 1.2.6
+  Version: 1.2.7
   Author: Brajesh Singh
   Author URI: http://buddydev.com/members/sbrajesh/
   License: GPL
@@ -59,10 +59,10 @@ class BPSimpleBlogPostComponent {
 		add_action( 'plugins_loaded', array( $this, 'load' ) );
 		
 		add_action( 'wp_enqueue_scripts', array( $this, 'load_js' ) );
-		add_filter( 'user_has_cap', array( $this, 'add_upload_cap_filter' ), 10, 3 );
+		add_filter( 'user_has_cap', array( $this, 'add_upload_cap_filter' ), 0, 3 );
 		add_filter( 'ajax_query_attachments_args', array( $this, 'filter_ajax_attachment_args' ) );
 		
-		add_action( 'set-post-thumbnail', array( $this, 'set_post_thumbnail' ), 0 );//high priority
+		add_action( 'wp_ajax_set-post-thumbnail', array( $this, 'set_post_thumbnail' ), 0 );//high priority
 		
 	}
 
@@ -118,8 +118,8 @@ class BPSimpleBlogPostComponent {
 	}
 	
 	public function add_upload_cap_filter( $allcaps, $cap, $args ) {
-
-		if ( $args[0] !== 'upload_files' ) {
+	
+		if ( $args[0] != 'upload_files' &&  $args[0] != 'edit_post' ) {
 			return $allcaps;
 		}
 		
@@ -127,7 +127,24 @@ class BPSimpleBlogPostComponent {
 			return $allcaps;
 		}
 		
-		$allcaps[ $cap[0] ] = true;
+		if ( $args[0] =='upload_files' ) {
+			$allcaps[ $cap[0] ] = true;
+			
+		} elseif ( $args[0] =='edit_post' ) {
+			
+			$user_id = get_current_user_id();
+			$post_id = isset( $args[2] ) ? absint( $args[2] ) : 0;
+			
+			if ( $post_id ) {
+				$post = get_post( $post_id );
+				
+				if( $post && $post->post_author == $user_id && $args[1] == $user_id ) {
+					$allcaps[ $cap[0] ] = true;
+					
+				}
+			}
+			
+		}
 		
 
 		return $allcaps;
@@ -177,17 +194,15 @@ class BPSimpleBlogPostComponent {
 
 		$json = ! empty( $_REQUEST['json'] ); // New-style request
 		
-		if( ! $json ) {
-			return ;//let wp handle it
-		}
-		
 		$post_ID = intval( $_POST['post_id'] );
 
 		$thumbnail_id = intval( $_POST['thumbnail_id'] );
 
-		if ( $json )
+		if ( $json ) {
 			check_ajax_referer( "update-post_$post_ID" );
-
+		} else {
+			check_ajax_referer( "set_post_thumbnail-$post_ID" );
+		}
 		if ( $thumbnail_id == '-1' ) {
 			if ( delete_post_thumbnail( $post_ID ) ) {
 				$return = _wp_post_thumbnail_html( null, $post_ID );
