@@ -33,10 +33,11 @@ class BPSimpleBlogPostComponent {
     private static $instance;
 
 	private $path = '';
+	private $url ='';
     private function __construct() {
 		
 		$this->path = plugin_dir_path( __FILE__ );
-        
+        $this->url = plugin_dir_url( __FILE__ );
 		$this->setup();
     }
 
@@ -57,9 +58,11 @@ class BPSimpleBlogPostComponent {
 		add_action( 'bp_init', array( $this, 'load_textdomain' ), 2 );
 		add_action( 'plugins_loaded', array( $this, 'load' ) );
 		
+		add_action( 'wp_enqueue_scripts', array( $this, 'load_js' ) );
 		add_filter( 'user_has_cap', array( $this, 'add_upload_cap_filter' ), 10, 3 );
 		add_filter( 'ajax_query_attachments_args', array( $this, 'filter_ajax_attachment_args' ) );
-
+		
+		add_action( 'set-post-thumbnail', array( $this, 'set_post_thumbnail' ), 0 );//high priority
 		
 	}
 
@@ -152,11 +155,12 @@ class BPSimpleBlogPostComponent {
 	}
 
 	
-    public function include_js() {
+    public function load_js() {
         
+		wp_register_script( 'bsfep-js', $this->url .'assets/bsfep.js', array( 'jquery'), false,  true );
     }
 
-    public function include_css() {
+    public function load_css() {
         
     }
 	/**
@@ -169,6 +173,39 @@ class BPSimpleBlogPostComponent {
 		return $this->path;
 	}
 
+	public function set_post_thumbnail() {
+
+		$json = ! empty( $_REQUEST['json'] ); // New-style request
+		
+		if( ! $json ) {
+			return ;//let wp handle it
+		}
+		
+		$post_ID = intval( $_POST['post_id'] );
+
+		$thumbnail_id = intval( $_POST['thumbnail_id'] );
+
+		if ( $json )
+			check_ajax_referer( "update-post_$post_ID" );
+
+		if ( $thumbnail_id == '-1' ) {
+			if ( delete_post_thumbnail( $post_ID ) ) {
+				$return = _wp_post_thumbnail_html( null, $post_ID );
+				$json ? wp_send_json_success( $return ) : wp_die( $return );
+			} else {
+				wp_die( 0 );
+			}
+		}
+
+		if ( set_post_thumbnail( $post_ID, $thumbnail_id ) ) {
+			$return = _wp_post_thumbnail_html( $thumbnail_id, $post_ID );
+			$json ? wp_send_json_success( $return ) : wp_die( $return );
+		}
+
+		wp_die( 0 );
+
+
+	}
 }
 
 
@@ -181,3 +218,4 @@ function bp_simple_blog_post_helper() {
 	return BPSimpleBlogPostComponent::get_instance();
 }
 BPSimpleBlogPostComponent::get_instance();
+

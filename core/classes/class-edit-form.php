@@ -15,6 +15,8 @@ class BPSimpleBlogPostEditForm {
    * @var string form id 
    */
     protected $id; 
+	
+	protected $post_id = 0;
     /**
 	 * It is trhe responsibility of developer to set it true or false based on whether he wants to allow the current user to post or not
 	 * @var type 
@@ -163,13 +165,19 @@ class BPSimpleBlogPostEditForm {
 		//upload count is deprecated, use allow_upload instead 
         $this->upload_count			= $upload_count;
 		
-        $this->has_post_thumbnail	= $has_post_thumbnail;
+       
 		
 		$this->allow_upload = $allow_upload;
 		
 		//back compat
 		if ( !  $this->allow_upload && $this->upload_count ) {
 			$this->allow_upload = true;
+		}
+				 
+		$this->has_post_thumbnail	= $has_post_thumbnail;
+		 
+		if ( ! $this->allow_upload ) {
+			 $this->has_post_thumbnail = false;//when upload is disabled, we don't want the featured image thingy
 		}
 		
         if ( $comment_status ) {
@@ -197,8 +205,8 @@ class BPSimpleBlogPostEditForm {
 		
         //needed for category/term walker
         require_once( trailingslashit( ABSPATH ) . 'wp-admin/includes/template.php' );
-        //will be exiting post for editing or 0 for new post
-        
+        require_once( trailingslashit( ABSPATH ) . 'wp-admin/includes/post.php' );
+       
 		$this->load_post_form();
     }
 	
@@ -212,7 +220,8 @@ class BPSimpleBlogPostEditForm {
 		
         $post_id = $this->get_post_id();
 
-
+		wp_enqueue_script( 'bsfep-js' );
+		
         $default = array(
             'title'     => isset( $_POST['bp_simple_post_title'] ) ? $_POST['bp_simple_post_title'] : '',
             'content'   => isset( $_POST['bp_simple_post_text'] )? $_POST['bp_simple_post_text'] : ''
@@ -221,6 +230,9 @@ class BPSimpleBlogPostEditForm {
         if ( ! empty( $post_id ) ) {
             //should we check if current user can edit this post ?
             $post = get_post( $post_id );
+			if( $post->post_status =='auto-draft' ) {
+				$post->post_title = '';
+			}
             $args = array(
                     'title'     => $post->post_title,
                     'content'   => $post->post_content
@@ -229,7 +241,7 @@ class BPSimpleBlogPostEditForm {
             $default = wp_parse_args( $args, $default );
         }
         
-        
+       
         extract( $default );
         //think about more flexibility her
         if ( locate_template( array( 'feposting/form.php' ), false ) ) {
@@ -264,7 +276,14 @@ class BPSimpleBlogPostEditForm {
      */
     protected function get_post_id() {
 		
-        return apply_filters( 'bpsp_editable_post_id', 0 );
+		if( ! $this->post_id ) {
+			
+			$post = bsfep_get_default_post_to_edit( $this->post_type, true );
+			$this->post_id = $post->ID;
+			
+		}
+		
+        return apply_filters( 'bpsp_editable_post_id', $this->post_id );
 		
     }
 

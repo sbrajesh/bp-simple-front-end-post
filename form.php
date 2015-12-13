@@ -9,9 +9,9 @@
 		<input type="hidden" name="bp_simple_post_form_id" value="<?php echo $this->id;?>" />
 		<input type="hidden" name="action" value="bp_simple_post_new_post_<?php echo $this->id;?>" />
 		<?php wp_nonce_field( 'bp_simple_post_new_post_' . $this->id ); ?>
-
+		<?php wp_nonce_field( 'update-post_' . $post_id, '_bsfep_media_uploader_nonce' );?>
 		<?php if ( $post_id ): ?>
-			<input type="hidden" name="post_id" value="<?php echo $post_id;?>" id="post_id"/>
+			<input type="hidden" name="post_id" value="<?php echo $post_id;?>" id="post_ID"/>
 		<?php endif;?>
 
 		<!-- you can modify these, just make sure to not change the name of the fields -->
@@ -25,7 +25,16 @@
 			 <?php wp_editor( $content, 'bp_simple_post_text', array( 'media_buttons'=> $this->allow_upload, 'quicktags'=> false)) ;?>
 		  
 		 </label>
-		
+		<?php if( $this->has_post_thumbnail ):?>
+			<div id="postimagediv"> 
+				<div class="inside">
+					<?php $thumbnail_id = get_post_meta( $post->ID, '_thumbnail_id', true );
+						echo _wp_post_thumbnail_html( $thumbnail_id, $post->ID );
+						?>
+				</div>
+
+			</div>
+		<?php endif;?>
 		<!-- taxonomy terms box -->
 		
 		<?php if ( $this->has_tax() ): ?>
