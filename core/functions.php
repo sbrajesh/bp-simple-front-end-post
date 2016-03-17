@@ -30,7 +30,6 @@ function bp_new_simple_blog_post_form( $form_name, $settings ) {
 function bp_get_simple_blog_post_form( $name ) {
     
 	$editor = BPSimpleBlogPostEditor::get_instance();
-	
     return $editor->get_form_by_name($name);
 }
 
@@ -43,7 +42,6 @@ function bp_get_simple_blog_post_form( $name ) {
 function bp_get_simple_blog_post_form_by_id( $form_id ) {
 	
     $editor = BPSimpleBlogPostEditor::get_instance();
-	
     return $editor->get_form_by_id( $form_id );
 }
 
@@ -61,22 +59,34 @@ function bp_get_simple_blog_post_form_by_id( $form_id ) {
  */
 function bsfep_get_default_post_to_edit( $post_type = 'post', $create_in_db = false ) {
 	$post_title = '';
-	if ( !empty( $_REQUEST['post_title'] ) )
+	if ( ! empty( $_REQUEST['post_title'] ) ) {
 		$post_title = esc_html( wp_unslash( $_REQUEST['post_title'] ));
+	}
 
 	$post_content = '';
-	if ( !empty( $_REQUEST['content'] ) )
+	if ( ! empty( $_REQUEST['content'] ) ) {
 		$post_content = esc_html( wp_unslash( $_REQUEST['content'] ));
+	}
 
 	$post_excerpt = '';
-	if ( !empty( $_REQUEST['excerpt'] ) )
+	if ( ! empty( $_REQUEST['excerpt'] ) ) {
 		$post_excerpt = esc_html( wp_unslash( $_REQUEST['excerpt'] ));
+	}
 
 	if ( $create_in_db ) {
-		$post_id = wp_insert_post( array( 'post_title' => __( 'Auto Draft' ), 'post_type' => $post_type, 'post_status' => 'auto-draft', 'post_author'=> get_current_user_id() ) );
+		$post_id = wp_insert_post( array(
+			'post_title'    => __( 'Auto Draft' ),
+			'post_type'     => $post_type,
+			'post_status'   => 'auto-draft',
+			'post_author'   => get_current_user_id()
+		) );
+
 		$post = get_post( $post_id );
-		if ( current_theme_supports( 'post-formats' ) && post_type_supports( $post->post_type, 'post-formats' ) && get_option( 'default_post_format' ) )
+
+		if ( current_theme_supports( 'post-formats' ) && post_type_supports( $post->post_type, 'post-formats' ) && get_option( 'default_post_format' ) ) {
 			set_post_format( $post, get_option( 'default_post_format' ) );
+		}
+
 	} else {
 		$post = new stdClass;
 		$post->ID = 0;
@@ -91,8 +101,8 @@ function bsfep_get_default_post_to_edit( $post_type = 'post', $create_in_db = fa
 		$post->pinged = '';
 		$post->comment_status = get_default_comment_status( $post_type );
 		$post->ping_status = get_default_comment_status( $post_type, 'pingback' );
-		$post->post_pingback = get_option( 'default_pingback_flag' );
-		$post->post_category = get_option( 'default_category' );
+		//$post->post_pingback = get_option( 'default_pingback_flag' );
+		//$post->post_category = get_option( 'default_category' );
 		$post->page_template = 'default';
 		$post->post_parent = 0;
 		$post->menu_order = 0;
@@ -101,9 +111,6 @@ function bsfep_get_default_post_to_edit( $post_type = 'post', $create_in_db = fa
 
 	/**
 	 * Filter the default post content initially used in the "Write Post" form.
-	 *
-	 * @since 1.5.0
-	 *
 	 * @param string  $post_content Default post content.
 	 * @param WP_Post $post         Post object.
 	 */
@@ -112,8 +119,6 @@ function bsfep_get_default_post_to_edit( $post_type = 'post', $create_in_db = fa
 	/**
 	 * Filter the default post title initially used in the "Write Post" form.
 	 *
-	 * @since 1.5.0
-	 *
 	 * @param string  $post_title Default post title.
 	 * @param WP_Post $post       Post object.
 	 */
@@ -121,8 +126,6 @@ function bsfep_get_default_post_to_edit( $post_type = 'post', $create_in_db = fa
 
 	/**
 	 * Filter the default post excerpt initially used in the "Write Post" form.
-	 *
-	 * @since 1.5.0
 	 *
 	 * @param string  $post_excerpt Default post excerpt.
 	 * @param WP_Post $post         Post object.

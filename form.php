@@ -8,8 +8,10 @@
 		
 		<input type="hidden" name="bp_simple_post_form_id" value="<?php echo $this->id;?>" />
 		<input type="hidden" name="action" value="bp_simple_post_new_post_<?php echo $this->id;?>" />
+
 		<?php wp_nonce_field( 'bp_simple_post_new_post_' . $this->id ); ?>
 		<?php wp_nonce_field( 'update-post_' . $post_id, '_bsfep_media_uploader_nonce' );?>
+
 		<?php if ( $post_id ): ?>
 			<input type="hidden" name="post_id" value="<?php echo $post_id;?>" id="post_ID"/>
 		<?php endif;?>
@@ -25,7 +27,7 @@
 			 <?php wp_editor( $content, 'bp_simple_post_text', array( 'media_buttons'=> $this->allow_upload, 'quicktags'=> false)) ;?>
 		  
 		 </label>
-		<?php if( $this->has_post_thumbnail ):?>
+		<?php if ( $this->has_post_thumbnail ):?>
 			<div id="postimagediv"> 
 				<div class="inside">
 					<?php $thumbnail_id = get_post_meta( $post->ID, '_thumbnail_id', true );
@@ -38,16 +40,11 @@
 		<!-- taxonomy terms box -->
 		
 		<?php if ( $this->has_tax() ): ?>
-		
 			<div class='simple-post-taxonomies-box clearfix'>
-				
 				<?php $this->render_taxonomies();?>
-				
 				<div class="clear"></div>
-				
-			</div>   
-		
-		<?php endif;?>   
+			</div>
+		<?php endif;?>
 
 		<!-- custom fields -->
 	   <?php if ( $this->has_custom_fields() ): ?>
@@ -55,13 +52,12 @@
 		<div class='simple-post-custom-fields'>
 
 			 <?php if ( $this->has_visible_meta() && $this->custom_field_title ): ?>
-			
 				 <h3> <?php echo $this->custom_field_title;?> </h3>
-				 
 			 <?php endif;?>
 
 			 <?php $this->render_custom_fields();?>
-		 </div>    
+		 </div>
+
 	   <?php endif;?>     
 
 		<?php if ( $this->show_comment_option ): ?>
@@ -85,12 +81,9 @@
 			</div>   
 
 		<?php endif;?>
-		
+
 		<input  type="hidden" value="<?php echo $_SERVER['REQUEST_URI']; ?>" name="post_form_url"  />
-
 		<input id="submit" name='bp_simple_post_form_subimitted' type="submit" value="<?php _e('Post','bsfep');?>" />
-
-
 	</form>
 </div>
 

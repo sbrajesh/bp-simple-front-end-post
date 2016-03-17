@@ -148,12 +148,9 @@ class BPSimpleBlogPostEditForm {
 
 		//if the author id is given
         if ( $post_author ) {
-         
 			$this->post_author = $post_author;
-			
-		} else {
-			
-			 $this->post_author = get_current_user_id();
+        } else {
+			$this->post_author = get_current_user_id();
 		}
 		//we will process the taxonomy & meta later
         $this->tax = $tax;
@@ -164,9 +161,7 @@ class BPSimpleBlogPostEditForm {
 		
 		//upload count is deprecated, use allow_upload instead 
         $this->upload_count			= $upload_count;
-		
-       
-		
+
 		$this->allow_upload = $allow_upload;
 		
 		//back compat
@@ -230,10 +225,12 @@ class BPSimpleBlogPostEditForm {
         if ( ! empty( $post_id ) ) {
             //should we check if current user can edit this post ?
             $post = get_post( $post_id );
-			if( $post->post_status =='auto-draft' ) {
+
+	        if ( $post->post_status =='auto-draft' ) {
 				$post->post_title = '';
 			}
-            $args = array(
+
+	        $args = array(
                     'title'     => $post->post_title,
                     'content'   => $post->post_content
                     );
@@ -245,9 +242,9 @@ class BPSimpleBlogPostEditForm {
         extract( $default );
         //think about more flexibility her
         if ( locate_template( array( 'feposting/form.php' ), false ) ) {
-                locate_template( array( 'feposting/form.php' ), true, false );//we may load it any no. of times
+	        locate_template( array( 'feposting/form.php' ), true, false );//we may load it any no. of times
 		} else {
-             include bp_simple_blog_post_helper ( )->get_path () . 'form.php' ;
+	        include bp_simple_blog_post_helper ( )->get_path () . 'form.php' ;
 		}
     }
 
@@ -276,15 +273,12 @@ class BPSimpleBlogPostEditForm {
      */
     protected function get_post_id() {
 		
-		if( ! $this->post_id ) {
-			
+		if ( ! $this->post_id ) {
 			$post = bsfep_get_default_post_to_edit( $this->post_type, true );
 			$this->post_id = $post->ID;
-			
 		}
 		
         return apply_filters( 'bpsp_editable_post_id', $this->post_id );
-		
     }
 
     /**
@@ -295,12 +289,10 @@ class BPSimpleBlogPostEditForm {
         $post_id = false;
         //verify nonce
         if ( ! wp_verify_nonce( $_POST['_wpnonce'], 'bp_simple_post_new_post_' . $this->id ) ) {
-			
-            bp_core_add_message( __( 'The Security check failed!', 'bpsfep' ), 'error' );
+	        bp_core_add_message( __( 'The Security check failed!', 'bpsfep' ), 'error' );
             return;//do not proceed
         }
 
-        
         $post_type_details = get_post_type_object( $this->post_type );
 
         $title		= $_POST['bp_simple_post_title'];
@@ -349,18 +341,14 @@ class BPSimpleBlogPostEditForm {
             $comment_status = $_POST['bp_simple_post_comment_status'];
 			
             if ( empty( $comment_status ) && ! $post_id ) {
-				
                 $comment_status = 'closed';//user has not checked it
-            
             }
 			
             if ( $comment_status ) {
-             
 				$post_data['comment_status'] = $comment_status;
 			}
 			
             if ( ! empty( $post_id ) ) {
-				
                 $post_data['ID'] = $post_id;
             //EDIT
 			}
@@ -368,7 +356,6 @@ class BPSimpleBlogPostEditForm {
             $post_id = wp_insert_post( $post_data );
             //if everything worked fine, the post was saved
             if ( ! is_wp_error( $post_id ) ) {
-
                 //update the taxonomy
                 //currently does not check if post type is associated with the taxonomy or not
                 //TODO: Make sure to check for the association of post type and category
@@ -380,9 +367,10 @@ class BPSimpleBlogPostEditForm {
 						
                         $selected_terms = array();
                         //get all selected terms, may be array, depends on whether a dd or checkklist
-                        if( isset( $_POST['tax_input'][$tax] ) )
-                            $selected_terms = (array) $_POST['tax_input'][$tax]; 
-                        
+                        if ( isset( $_POST['tax_input'][$tax] ) ) {
+	                        $selected_terms = (array) $_POST['tax_input'][$tax];
+                        }
+
                         //check if include is given when the form was registered and this is a subset of include
                         if ( ! empty( $tax_options['include'] ) ) {
 
@@ -401,15 +389,11 @@ class BPSimpleBlogPostEditForm {
                         if ( empty( $selected_terms ) && isset( $tax_options['include'] ) )
                             $selected_terms = $tax_options['include']; 
 
-                         
                         //update the taxonomy/post association
 
                         if ( ! empty( $selected_terms ) ) {
-							
                             $selected_terms = array_map( 'intval', $selected_terms );
-                           
                             wp_set_object_terms( $post_id, $selected_terms, $tax );
-                           
                         }
                         
                     }//end of the loop
@@ -425,7 +409,6 @@ class BPSimpleBlogPostEditForm {
                     $updated_field = (array) $_POST['custom_fields']; //array of key=>value pair
                    
                     foreach ( $this->custom_fields as $key => $data ) {
-                        
                         //shouldn't we validate the data?
                         $value = $this->get_validated( $key, $updated_field[$key], $data );
 
@@ -434,7 +417,6 @@ class BPSimpleBlogPostEditForm {
                             //delete older one if there is a post id
                             //it may not be a very good idea to delete old post meta field, but we don't know the field has multiple entries or single and cann mess arounf
                             if ( $post_id ) {
-                             
 								delete_post_meta( $post_id, $key );
 							}
 							
@@ -443,7 +425,6 @@ class BPSimpleBlogPostEditForm {
 							}
 							
                         } else {
-							
 							update_post_meta( $post_id, $key, $value );
 						}	
                     }
@@ -462,31 +443,25 @@ class BPSimpleBlogPostEditForm {
                     $input_field_name = 'bp_simple_post_upload_thumbnail';
                     $attachment = $this->handle_upload( $post_id, $input_field_name, 'bpsfep_new_post' );
                     
-                    if( $post_id && $attachment && wp_attachment_is_image( $attachment ) ) {
-                     
-						set_post_thumbnail ( $post_id, $attachment );
+                    if ( $post_id && $attachment && wp_attachment_is_image( $attachment ) ) {
+             			set_post_thumbnail ( $post_id, $attachment );
 					}	
 
                 }
 				
-				if( get_post_status( $post_id ) == 'publish' ) {
-					
+				if ( get_post_status( $post_id ) == 'publish' ) {
 					$message =  sprintf( __( '%s saved and published successfully.', 'bsfep' ), $post_type_details->labels->singular_name );
-					
 				} else {
-				
 					$message = sprintf( __( '%s saved as %s successfully.', 'bsfep' ), $post_type_details->labels->singular_name, $this->post_status );
-                
 				}
 				
 				$message = apply_filters( 'bsfep_post_success_message', $message, $post_id, $post_type_details, $this );
 				 
 				bp_core_add_message( $message, $error );
-				
-				 
+
 				do_action( 'bsfep_post_saved', $post_id, $is_new );
 				 
-				if( ! empty( $this->update_callback ) && is_callable( $this->update_callback ) ) {
+				if ( ! empty( $this->update_callback ) && is_callable( $this->update_callback ) ) {
 					call_user_func( $this->update_callback, $post_id, $is_new, $this );
 				}
 				
@@ -504,7 +479,7 @@ class BPSimpleBlogPostEditForm {
            $message = $this->message;
 		}
 		
-		if( $error ) {
+		if ( $error ) {
            $error = 'error';//buddypress core_add_message does not understand boolean properly
 		}
 		
@@ -514,7 +489,7 @@ class BPSimpleBlogPostEditForm {
     /**
      * Renders html for individual custom field
      * @param type $field_data array of array(type=>checkbox/dd/input/textbox
-     * @param type $current_value
+     * @param mixed $current_value
      * @return string 
      */
     public function render_field( $field_data, $current_value = false ) {
@@ -526,69 +501,56 @@ class BPSimpleBlogPostEditForm {
         $name = "custom_fields[$key]";
         
 		if ( $type == 'checkbox' ) {
-         
-			$name = $name . "[]";
-			
+     		$name = $name . "[]";
 		}
 		
         switch ( $type ) {
 			
             case 'textbox':
-				
-                $input = "<label>{$label}<input type='text' name='{$name}' id='custom-field-{$key}' value='{$current_value}' /></label>";
-                
-				break;
+	            $input = "<label>{$label}<input type='text' name='{$name}' id='custom-field-{$key}' value='{$current_value}' /></label>";
+    			break;
 
             case 'textarea':
-				
-                $input = "<label>{$label}</label><textarea  name='{$name}' id='custom-field-{$key}' >{$current_value}</textarea>";
-                
-				break;
+	            $input = "<label>{$label}</label><textarea  name='{$name}' id='custom-field-{$key}' >{$current_value}</textarea>";
+    			break;
 
             case 'radio':
-				
-                $input = "<label>{$label}</label>";
-                
-				foreach ( $options as $option )
-                    $input .= "<label>{$option['label']}<input type='radio' name='{$name}' " . checked($option['value'], $current_value, false) . "  value='" . $option['value'] . "' /></label>";
+	            $input = "<label>{$label}</label>";
 
+    			foreach ( $options as $option ) {
+				    $input .= "<label>{$option['label']}<input type='radio' name='{$name}' " . checked($option['value'], $current_value, false) . "  value='" . $option['value'] . "' /></label>";
+			    }
                 break;
 
             case 'select':
-				
                 $input = "<label>{$label}<select name='{$name}' id='custom-field-{$key}'>";
-                
-				foreach ( $options as $option )
-                    $input .= "<option  " . selected($option['value'], $current_value, false) . "  value='" . $option['value'] . "' >{$option['label']}</option>";
 
+				foreach ( $options as $option ) {
+					$input .= "<option  " . selected($option['value'], $current_value, false) . "  value='" . $option['value'] . "' >{$option['label']}</option>";
+				}
                 $input .= "</select></label>";
                 break;
 
             case 'checkbox':
-				
                 $input = "<label>{$label}</label>";
                 
-				foreach ( $options as $option )
-                    $input.="<label>{$option['label']}<input type='checkbox' name='{$name}' " . checked($option['value'], $current_value, false) . "  value='" . $option['value'] . "' /></label>";
+				foreach ( $options as $option ) {
+					$input.="<label>{$option['label']}<input type='checkbox' name='{$name}' " . checked($option['value'], $current_value, false) . "  value='" . $option['value'] . "' /></label>";
+				}
 
                 break;
 
             case 'date':
-				
-                $input = "<label>{$label}<input type='text' class='bp-simple-front-end-post-date'  id='custom-field-{$key}' name='{$name}' value='{$current_value}' /></label>";
-                
-				break;
-            case 'url':
-				
-                $input = "<label>{$label}<input type='text' class='bp-simple-front-end-post-url'  id='custom-field-{$key}' name='{$name}' value='{$current_value}' /></label>";
-                
-				break;
+		        $input = "<label>{$label}<input type='text' class='bp-simple-front-end-post-date'  id='custom-field-{$key}' name='{$name}' value='{$current_value}' /></label>";
+        		break;
+
+	        case 'url':
+			    $input = "<label>{$label}<input type='text' class='bp-simple-front-end-post-url'  id='custom-field-{$key}' name='{$name}' value='{$current_value}' /></label>";
+            	break;
 			
             case 'hidden':
-				
-                $input = "<input type='hidden' class='bp-simple-front-end-post-hidden'  id='custom-field-{$key}' name='{$name}' value='{$current_value}' />";
-                
-				break;
+			    $input = "<input type='hidden' class='bp-simple-front-end-post-hidden'  id='custom-field-{$key}' name='{$name}' value='{$current_value}' />";
+            	break;
 
             default:
                 $input = '';
@@ -616,15 +578,12 @@ class BPSimpleBlogPostEditForm {
             case 'textarea':
             case 'hidden':
                 $sanitized = esc_attr( $value ); //should we escape?   
-                
-				break;
-
+            	break;
 
             case 'radio':
             case 'select':
 
                 foreach ( $options as $option ) {
-                 
 					if ( $option['value'] == $value ) {
                         $sanitized = $value;
 					}
@@ -632,22 +591,14 @@ class BPSimpleBlogPostEditForm {
 				}
 				
                 break;
-
-
-
-           //for checkbox     
+           //for checkbox
             case 'checkbox':
-                
 				$vals = array();
                 
 				foreach ( $options as $option ) {//how to validate
-                 
 					$vals[] = $option['value'];
-					
 				}
-				
                 $sanitized = array_diff( $vals, (array) $vals );
-
                 break;
 
 			case 'url':	
@@ -658,9 +609,7 @@ class BPSimpleBlogPostEditForm {
 				$sanitized = intval( $value );
 				break;
             default:
-				
                 $sanitized = '';
-                
 				break;
         }
 		
@@ -689,8 +638,8 @@ class BPSimpleBlogPostEditForm {
      *
      * @see wp-admin/includes/template.php:wp_terms_checklist
      * modified to include categories
-     * @param type $post_id
-     * @param type $args 
+     * @param int $post_id
+     * @param array $args
      */
     public function wp_terms_checklist( $post_id = 0, $args = array() ) {
 		
@@ -706,11 +655,8 @@ class BPSimpleBlogPostEditForm {
 		
         extract( wp_parse_args( $args, $defaults ), EXTR_SKIP );
 
-		
         if ( empty( $walker ) || ! is_a( $walker, 'Walker') ) {
-         
 			$walker = new BPSimplePostTermsChecklistWalker;//custom walker
-			
 		}
 		
         $descendants_and_self = (int) $descendants_and_self;
@@ -722,37 +668,26 @@ class BPSimpleBlogPostEditForm {
         $args['disabled'] = false;//allow everyone to assign the tax !current_user_can($tax->cap->assign_terms);
 
         if ( is_array( $selected_cats ) ) {
-			
             $args['selected_cats'] = $selected_cats;
-			
 		} elseif ( $post_id ) {
-			
             $args['selected_cats'] = wp_get_object_terms( $post_id, $taxonomy, array_merge( $args, array( 'fields' => 'ids' ) ) );
-			
-		}else {
-			
+		} else {
             $args['selected_cats'] = array();
-			
 		}
 		
         if ( is_array( $popular_cats ) ) {
-            
 			$args['popular_cats'] = $popular_cats;
-			
 		} else {
-         
 			$args['popular_cats'] = get_terms( $taxonomy, array( 'fields' => 'ids', 'orderby' => 'count', 'order' => 'DESC', 'number' => 10, 'hierarchical' => false ) );
 		}
 		
         if ( $descendants_and_self ) {
-			
 			$categories = (array) get_terms( $taxonomy, array( 'child_of' => $descendants_and_self, 'hierarchical' => 0, 'hide_empty' => 0 ) );
 			$self = get_term( $descendants_and_self, $taxonomy );
 			
 			array_unshift( $categories, $self );
 			
         } else {
-
             $categories = (array) get_terms( $taxonomy, array( 'get' => 'all', 'include' => $include ) );
         }
 		
@@ -770,10 +705,9 @@ class BPSimpleBlogPostEditForm {
 
             foreach ( $keys as $k ) {
 				
-                if ( in_array( $categories[$k]->term_id, $args['selected_cats'] ) ) {
-					
-                    $checked_categories[] = $categories[$k];
-                    unset( $categories[$k] );
+                if ( in_array( $categories[ $k ]->term_id, $args['selected_cats'] ) ) {
+                    $checked_categories[] = $categories[ $k ];
+                    unset( $categories[ $k ] );
                 }
             }
 
@@ -817,15 +751,11 @@ class BPSimpleBlogPostEditForm {
         $excluded = false;
         
 		if ( is_array( $selected ) ) {
-         
-			$selected = array_pop($selected); //in dd, we don't allow multiple values at the moment
-			
+     		$selected = array_pop($selected); //in dd, we don't allow multiple values at the moment
 		}
 		
         if ( ! empty( $include ) ) {
-         
-			$excluded = array_diff( (array) get_terms( $taxonomy, array( 'fields' => 'ids', 'get' => 'all' ) ), $include );
-			
+    		$excluded = array_diff( (array) get_terms( $taxonomy, array( 'fields' => 'ids', 'get' => 'all' ) ), $include );
 		}
 		
         $tax = get_taxonomy( $taxonomy );
@@ -833,19 +763,15 @@ class BPSimpleBlogPostEditForm {
         if ( $show_option_all ) {
 
             if ( ! $select_label ) {
-				
-                $show_option_all = sprintf( __( 'Select %s', 'bpsep' ), $tax->labels->singular_name );
-				
-			}else {
-				
-                $show_option_all = $select_label;
+	            $show_option_all = sprintf( __( 'Select %s', 'bpsep' ), $tax->labels->singular_name );
+			} else {
+		        $show_option_all = $select_label;
 			}	
         }
 		
         $always_echo = false;
 		
         if ( empty( $name ) ) {
-			
 			$name = 'tax_input[' . $taxonomy . ']';
 		}	
 
@@ -867,18 +793,14 @@ class BPSimpleBlogPostEditForm {
         $html = "<div class='simple-post-tax-wrap simple-post-tax-{$taxonomy}-wrap'>";
         
 		if ( $show_label ) {
-			
-            $info = "<div class='simple-post-tax simple-post-tax-{$taxonomy}'><h3>{$tax->labels->singular_name}</h3>" . $info . "</div>";
+	        $info = "<div class='simple-post-tax simple-post-tax-{$taxonomy}'><h3>{$tax->labels->singular_name}</h3>" . $info . "</div>";
 		} 
 			
 		$html = $html . $info . '</div>';
 		
         if ( $echo ) {
-			
 			echo $html;
-			
 		} else {
-			
 			return $html;
 		}	
     }
@@ -953,21 +875,16 @@ class BPSimpleBlogPostEditForm {
 			if ( $tax_options['view_type'] && $tax_options['view_type'] == 'dd' ) {
 
 				if ( $post_id ) {
-
 					$tax_options['selected'] = $this->get_term_ids( $post_id, $tax );//array_pop($tax_options['include']);
-
 				} elseif ( isset( $_POST['tax_input'][ $tax ] ) ) {
-
 					//if this is form submit and some taxonomies were selected
 					$tax_options['selected'] = $_POST['tax_input'][ $tax ];
 				}
 
 				if ( ! empty( $tax_options['include'] ) ) {
-
-					$tax_options['show_all_terms'] = 0;   
+					$tax_options['show_all_terms'] = 0;
 				}
-				
-				
+
 				echo $this->list_terms_dd( $tax_options );
 
 			} else {
@@ -976,7 +893,6 @@ class BPSimpleBlogPostEditForm {
 				if ( isset( $_POST['tax_input'][ $tax ] ) && ! empty( $_POST['tax_input'][ $tax ] ) ) {
 						//if this is form submit and some taxonomies were selected
 					$tax_options['selected_cats'] = $_POST['tax_input'][$tax];
-
 				}
 				
 				if ( isset( $tax_options['child_of'] ) ) {
@@ -988,9 +904,7 @@ class BPSimpleBlogPostEditForm {
 			}   
 				//$selected=wp_get_object_terms($ticket_id, $taxonomy,array('fields' => 'ids'));
 			// $selected=  array_pop($selected);
-
-
-		}   
+		}
      
     }
     
@@ -1007,21 +921,16 @@ class BPSimpleBlogPostEditForm {
             $val = false;
 
             if ( $field['default'] ) {
-				
-                $val = $field['default'];
+	          $val = $field['default'];
 			}	
             
-			if ( $post_id ) {
-				
-                $single = true;
+			if ( $post_id && get_post_status( $post_id ) != 'auto-draft') {
+	            $single = true;
 
 				if ( $field['type'] == 'checkbox' ) {
-                 
-					$single = false;
+    				$single = false;
 				}	
-               
-				$val = get_post_meta( $post_id, $key, $single );
-
+    			$val = get_post_meta( $post_id, $key, $single );
             }
             
 			$field['key'] = $key;
@@ -1037,7 +946,6 @@ class BPSimpleBlogPostEditForm {
 	 * @return string md5 hashed unique form id
 	 */
 	public function get_id() {
-		
 		return $this->id;
 	}
 	

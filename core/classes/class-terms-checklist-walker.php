@@ -10,7 +10,6 @@ class BPSimplePostTermsChecklistWalker extends Walker {
 	public $db_fields = array( 'parent' => 'parent', 'id' => 'term_id' ); //TODO: decouple this
 
 	public function start_lvl ( &$output, $depth = 0, $args = array() ) {
-		
 		$indent = str_repeat( "\t", $depth );
 		$output .= "$indent<ul class='children'>\n";
 	}
@@ -24,9 +23,9 @@ class BPSimplePostTermsChecklistWalker extends Walker {
 		
 		extract( $args );
 		
-		if ( empty( $taxonomy ) )
+		if ( empty( $taxonomy ) ) {
 			$taxonomy = 'category';
-
+		}
 
 		$name = 'tax_input[' . $taxonomy . ']';
 

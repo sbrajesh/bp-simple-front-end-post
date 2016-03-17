@@ -4,7 +4,7 @@
   Plugin Name: BP Simple Front End Post
   Plugin URI: http://buddydev.com/plugins/bp-simple-front-end-post/
   Description: Provides the ability to create unlimited post forms and allow users to save the post from front end.It is much powerful than it looks.
-  Version: 1.2.7
+  Version: 1.2.8
   Author: Brajesh Singh
   Author URI: http://buddydev.com/members/sbrajesh/
   License: GPL
@@ -47,9 +47,10 @@ class BPSimpleBlogPostComponent {
      */
     public static function get_instance() {
 		
-        if ( ! isset( self::$instance ) )
-            self::$instance = new self();
-		
+        if ( ! isset( self::$instance ) ) {
+			self::$instance = new self();
+        }
+
         return self::$instance;
     }
 	
@@ -77,11 +78,10 @@ class BPSimpleBlogPostComponent {
 			'core/functions.php',
 		);
 		
-		if( is_admin() ) {
+		if ( is_admin() ) {
 		//	return ;//we don't need these in admin
 		}
-		foreach( $files as $file ) {
-			
+		foreach ( $files as $file ) {
 			require_once $path . $file ;
 		}
 		
@@ -145,7 +145,6 @@ class BPSimpleBlogPostComponent {
 			}
 			
 		}
-		
 
 		return $allcaps;
 
@@ -159,11 +158,10 @@ class BPSimpleBlogPostComponent {
 	 */
 	public function filter_ajax_attachment_args( $args ) {
 
-		if( ! $this->enable_upload_filters() ) {
+		if ( ! $this->enable_upload_filters() ) {
 			return $args;
 		}
-		
-		
+
 		if ( is_user_logged_in() ) {
 			$args['author'] = get_current_user_id();
 		}
@@ -173,8 +171,7 @@ class BPSimpleBlogPostComponent {
 
 	
     public function load_js() {
-        
-		wp_register_script( 'bsfep-js', $this->url .'assets/bsfep.js', array( 'jquery'), false,  true );
+   	    wp_register_script( 'bsfep-js', $this->url .'assets/bsfep.js', array( 'jquery'), false,  true );
     }
 
     public function load_css() {
@@ -186,7 +183,6 @@ class BPSimpleBlogPostComponent {
 	 * @return type
 	 */
 	public function get_path() {
-		
 		return $this->path;
 	}
 
@@ -232,5 +228,5 @@ class BPSimpleBlogPostComponent {
 function bp_simple_blog_post_helper() {
 	return BPSimpleBlogPostComponent::get_instance();
 }
-BPSimpleBlogPostComponent::get_instance();
 
+BPSimpleBlogPostComponent::get_instance();

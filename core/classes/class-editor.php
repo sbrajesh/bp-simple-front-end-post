@@ -25,8 +25,7 @@ class BPSimpleBlogPostEditor {
     public static function get_instance() {
 		
         if ( ! isset( self::$instance ) ) {
-         
-			self::$instance = new self();
+   		    self::$instance = new self();
 		}	
         
         return self::$instance;
@@ -38,7 +37,6 @@ class BPSimpleBlogPostEditor {
      * @param BPSimpleBlogPostEditForm $form 
      */
     public function register_form( $form ) {
-		
         $this->forms[ $form->get_id() ] = $form; //save/overwrite
     }
 
@@ -63,7 +61,6 @@ class BPSimpleBlogPostEditor {
     public function get_form_by_id( $form_id ) {
 
         if ( isset( $this->forms[ $form_id ] ) ) {
-         
 			return $this->forms[ $form_id ];
 		}	
 		
