@@ -434,21 +434,7 @@ class BPSimpleBlogPostEditForm {
                 //check for upload 
                 //upload and save
 
-                $action = 'bp_simple_post_new_post_' . $this->id;
-			
 
-                //set post thumbnail
-                if ( $this->has_post_thumbnail ) {
-                    
-                    $input_field_name = 'bp_simple_post_upload_thumbnail';
-                    $attachment = $this->handle_upload( $post_id, $input_field_name, 'bpsfep_new_post' );
-                    
-                    if ( $post_id && $attachment && wp_attachment_is_image( $attachment ) ) {
-             			set_post_thumbnail ( $post_id, $attachment );
-					}	
-
-                }
-				
 				if ( get_post_status( $post_id ) == 'publish' ) {
 					$message =  sprintf( __( '%s saved and published successfully.', 'bsfep' ), $post_type_details->labels->singular_name );
 				} else {

@@ -2,7 +2,7 @@
 
 <div class="bp-simple-post-form">
 
-	<form class="standard-form bp-simple-post-form"  method="post" action=""  enctype="multipart/form-data">
+	<form class="standard-form bp-simple-post-form"  method="post" action=""  enctype="multipart/form-data" id="<?php echo $this->get_id();?>">
 
 		<!-- do not modify/remove the line blow -->
 		
