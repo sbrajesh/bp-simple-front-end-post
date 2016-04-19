@@ -241,8 +241,8 @@ class BPSimpleBlogPostEditForm {
        
         extract( $default );
         //think about more flexibility her
-        if ( locate_template( array( 'feposting/form.php' ), false ) ) {
-	        locate_template( array( 'feposting/form.php' ), true, false );//we may load it any no. of times
+	    if ( $located = locate_template( array( 'feposting/form.php' ), false ) ) {
+	        require_once $located;//we may load it any no. of times
 		} else {
 	        include bp_simple_blog_post_helper ( )->get_path () . 'form.php' ;
 		}
