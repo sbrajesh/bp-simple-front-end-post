@@ -338,7 +338,7 @@ class BPSimpleBlogPostEditForm {
                 'post_title'    => $title
             );
             //find comment_status
-            $comment_status = $_POST['bp_simple_post_comment_status'];
+            $comment_status = isset( $_POST['bp_simple_post_comment_status'] ) ? $_POST['bp_simple_post_comment_status'] : $this->comment_status;
 			
             if ( empty( $comment_status ) && ! $post_id ) {
                 $comment_status = 'closed';//user has not checked it
@@ -406,7 +406,7 @@ class BPSimpleBlogPostEditForm {
 
                 if ( ! empty( $this->custom_fields ) ) {
                     //which fields were updated
-                    $updated_field = (array) $_POST['custom_fields']; //array of key=>value pair
+                    $updated_field = isset( $_POST['custom_fields'] ) ? (array) $_POST['custom_fields'] : array(); //array of key=>value pair
                    
                     foreach ( $this->custom_fields as $key => $data ) {
                         //shouldn't we validate the data?
