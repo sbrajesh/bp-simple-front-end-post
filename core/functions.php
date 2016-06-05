@@ -75,7 +75,7 @@ function bsfep_get_default_post_to_edit( $post_type = 'post', $create_in_db = fa
 
 	if ( $create_in_db ) {
 		$post_id = wp_insert_post( array(
-			'post_title'    => __( 'Auto Draft' ),
+			'post_title'    => __( 'Auto Draft', 'bp-simple-front-end-post' ),
 			'post_type'     => $post_type,
 			'post_status'   => 'auto-draft',
 			'post_author'   => get_current_user_id()
