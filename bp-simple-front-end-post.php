@@ -89,19 +89,7 @@ class BPSimpleBlogPostComponent {
     //localization
     public function load_textdomain() {
 
-
-        $locale = apply_filters( 'bsfep_load_textdomain_get_locale', get_locale() );
-
-        // if load .mo file
-        if ( ! empty( $locale ) ) {
-            $mofile_default = sprintf( '%slanguages/%s.mo', plugin_dir_path(__FILE__), $locale );
-
-            $mofile = apply_filters( 'bsfep_load_mofile', $mofile_default );
-            // make sure file exists, and load it
-            if ( file_exists( $mofile ) ) {
-                load_textdomain( 'bsfep', $mofile );
-            }
-        }
+	    load_plugin_textdomain( 'bp-simple-front-end-post', false, plugin_basename( dirname( __FILE__ ) ) . '/languages' );
     }
 
 	/**

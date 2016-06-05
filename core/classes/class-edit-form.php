@@ -314,7 +314,7 @@ class BPSimpleBlogPostEditForm {
             //in future, we may relax this check
             if ( ! ( $post->post_author == get_current_user_id() || is_super_admin() ) ) {
                 $error = true;
-                $message = __( 'You are not authorized for the action!', 'bsfep' );
+                $message = __( 'You are not authorized for the action!', 'bp-simple-front-end-post' );
             }
 			
 			$is_new = false; //this is an update of existing post
@@ -323,7 +323,7 @@ class BPSimpleBlogPostEditForm {
         if ( empty( $title ) || empty( $content ) ) {
 			
             $error = true;
-            $message = __( 'Please make sure to fill the required fields', 'bsfep' );
+            $message = __( 'Please make sure to fill the required fields', 'bp-simple-front-end-post' );
         }
 
         $error =  apply_filters( 'bsfep_validate_post', $error, $_POST );
@@ -436,9 +436,9 @@ class BPSimpleBlogPostEditForm {
 
 
 				if ( get_post_status( $post_id ) == 'publish' ) {
-					$message =  sprintf( __( '%s saved and published successfully.', 'bsfep' ), $post_type_details->labels->singular_name );
+					$message =  sprintf( __( '%s saved and published successfully.', 'bp-simple-front-end-post' ), $post_type_details->labels->singular_name );
 				} else {
-					$message = sprintf( __( '%s saved as %s successfully.', 'bsfep' ), $post_type_details->labels->singular_name, $this->post_status );
+					$message = sprintf( __( '%s saved as %s successfully.', 'bp-simple-front-end-post' ), $post_type_details->labels->singular_name, $this->post_status );
 				}
 				
 				$message = apply_filters( 'bsfep_post_success_message', $message, $post_id, $post_type_details, $this );
@@ -456,7 +456,7 @@ class BPSimpleBlogPostEditForm {
             } else {
                 
 				$error = true;
-                $message = sprintf( __( 'There was a problem saving your %s. Please try again later.', 'bsfep' ), $post_type_details->labels->singular_name );
+                $message = sprintf( __( 'There was a problem saving your %s. Please try again later.', 'bp-simple-front-end-post' ), $post_type_details->labels->singular_name );
             }
         }
         
@@ -749,7 +749,7 @@ class BPSimpleBlogPostEditForm {
         if ( $show_option_all ) {
 
             if ( ! $select_label ) {
-	            $show_option_all = sprintf( __( 'Select %s', 'bpsep' ), $tax->labels->singular_name );
+	            $show_option_all = sprintf( __( 'Select %s', 'bp-simple-front-end-post' ), $tax->labels->singular_name );
 			} else {
 		        $show_option_all = $select_label;
 			}	

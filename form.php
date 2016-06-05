@@ -18,11 +18,11 @@
 
 		<!-- you can modify these, just make sure to not change the name of the fields -->
 
-		 <label for="bp_simple_post_title"><?php _e( 'Title:', 'bsfep' );?>
+		 <label for="bp_simple_post_title"><?php _e( 'Title:', 'bp-simple-front-end-post' );?>
 			<input type="text" name="bp_simple_post_title"  value="<?php echo $title;?>"/>
 		 </label>
 
-		 <label for="bp_simple_post_text" ><?php _e( 'Post:', 'bsfep' ); ?>
+		 <label for="bp_simple_post_text" ><?php _e( 'Post:', 'bp-simple-front-end-post' ); ?>
 			 
 			 <?php wp_editor( $content, 'bp_simple_post_text', array( 'media_buttons'=> $this->allow_upload, 'quicktags'=> false)) ;?>
 		  
@@ -64,7 +64,7 @@
 		
 			<div class="simple-post-comment-option">
 				
-				<h4><?php _e( 'Allow Comments', 'bsfep');?></h4>
+				<h4><?php _e( 'Allow Comments', 'bp-simple-front-end-post');?></h4>
 				
 				<?php $current_status = $this->comment_status;
 					
@@ -75,7 +75,7 @@
 				?>
 
 				<label for="bp-simple-post-comment-status">
-					<input id="bp-simple-post-comment-status" name="bp_simple_post_comment_status" type="checkbox" value="open" <?php echo checked('open', $current_status);?> /> <?php _e( 'Yes', 'bsfep');?>
+					<input id="bp-simple-post-comment-status" name="bp_simple_post_comment_status" type="checkbox" value="open" <?php echo checked('open', $current_status);?> /> <?php _e( 'Yes', 'bp-simple-front-end-post');?>
 			   </label>
 
 			</div>   
@@ -83,7 +83,7 @@
 		<?php endif;?>
 
 		<input  type="hidden" value="<?php echo $_SERVER['REQUEST_URI']; ?>" name="post_form_url"  />
-		<input id="submit" name='bp_simple_post_form_subimitted' type="submit" value="<?php _e('Post','bsfep');?>" />
+		<input id="submit" name='bp_simple_post_form_subimitted' type="submit" value="<?php _e('Post','bp-simple-front-end-post');?>" />
 	</form>
 </div>
 
