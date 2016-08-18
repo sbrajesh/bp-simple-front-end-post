@@ -497,7 +497,7 @@ class BPSimpleBlogPostEditForm {
     			break;
 
             case 'textarea':
-	            $input = "<label>{$label}</label><textarea  name='{$name}' id='custom-field-{$key}' >{$current_value}</textarea>";
+	            $input = "<label>{$label}</label><textarea  name='{$name}' id='custom-field-{$key}' maxlength='{$maxlength}'>{$current_value}</textarea>";
     			break;
 
             case 'radio':
