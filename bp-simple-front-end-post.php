@@ -105,8 +105,8 @@ class BPSimpleBlogPostComponent {
 	 */
 	public function enable_upload_filters() {
 
-		$apply = function_exists( 'is_buddypress' ) && is_buddypress();
-		$apply = apply_filters( 'bsfep_enable_upload_filters', $apply );
+		$apply = function_exists( 'is_buddypress' ) && is_buddypress() && ! did_action( 'wp_footer' );
+		$apply = apply_filters( 'bsfep_enable_upload_filters', $apply ) ;
 
 		return $apply;
 	}
