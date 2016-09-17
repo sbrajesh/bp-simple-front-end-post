@@ -117,7 +117,7 @@ class BPSimpleBlogPostComponent {
 			return $allcaps;
 		}
 
-		if ( ! $this->enable_upload_filters() ) {
+		if ( ! $this->enable_upload_filters() || ! is_user_logged_in() ) {
 			return $allcaps;
 		}
 
