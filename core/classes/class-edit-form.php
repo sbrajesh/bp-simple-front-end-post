@@ -297,6 +297,7 @@ class BPSimpleBlogPostEditForm {
 
         $title		= $_POST['bp_simple_post_title'];
         $content	= $_POST['bp_simple_post_text'];
+
         $message	= '';
         $error		= '';
 		
@@ -327,16 +328,22 @@ class BPSimpleBlogPostEditForm {
         }
 
         $error =  apply_filters( 'bsfep_validate_post', $error, $_POST );
-        
-        if ( ! $error ) {
+
+	    if ( ! $error ) {
             
             $post_data = array(
                 'post_author'   => $this->post_author,
                 'post_content'  => $content,
                 'post_type'     => $this->post_type,
                 'post_status'   => $this->post_status,
-                'post_title'    => $title
+                'post_title'    => $title,
+
             );
+		    
+		    if( ! empty( $_POST['_thumbnail_id'] ) ) {
+			    $post_data['_thumbnail_id'] = absint( $_REQUEST['_thumbnail_id'] );
+		    }
+
             //find comment_status
             $comment_status = isset( $_POST['bp_simple_post_comment_status'] ) ? $_POST['bp_simple_post_comment_status'] : $this->comment_status;
 			
@@ -446,7 +453,7 @@ class BPSimpleBlogPostEditForm {
 				bp_core_add_message( $message, $error );
 
 				do_action( 'bsfep_post_saved', $post_id, $is_new );
-				 
+
 				if ( ! empty( $this->update_callback ) && is_callable( $this->update_callback ) ) {
 					call_user_func( $this->update_callback, $post_id, $is_new, $this );
 				}

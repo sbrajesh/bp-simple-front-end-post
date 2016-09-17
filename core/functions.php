@@ -13,7 +13,7 @@
  * @return BPSimpleBlogPostEditForm 
  */
 function bp_new_simple_blog_post_form( $form_name, $settings ) {
-
+	
     $form = new BPSimpleBlogPostEditForm( $form_name, $settings );
     
 	$editor = BPSimpleBlogPostEditor::get_instance();
