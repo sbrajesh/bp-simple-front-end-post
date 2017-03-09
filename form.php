@@ -15,14 +15,14 @@
                 <input type="hidden" name="post_id" value="<?php echo $post_id; ?>" id="post_ID"/>
 			<?php endif; ?>
 
-			<?php do_action( 'bp_sfep_before_title', $this->id, $post_id ); ?>
+			<?php do_action( 'bsfep_before_title', $this->id, $post_id ); ?>
             <!-- you can modify these, just make sure to not change the name of the fields -->
 
             <label for="bp_simple_post_title"><?php _e( 'Title:', 'bp-simple-front-end-post' ); ?>
                 <input type="text" name="bp_simple_post_title" value="<?php echo $title; ?>"/>
             </label>
 
-			<?php do_action( 'bp_sfep_before_content', $this->id, $post_id ); ?>
+			<?php do_action( 'bsfep_before_content', $this->id, $post_id ); ?>
 
             <label for="bp_simple_post_text"><?php _e( 'Post:', 'bp-simple-front-end-post' ); ?>
 
@@ -33,7 +33,7 @@
 
             </label>
 
-            <?php do_action( 'bp_sfep_before_thumbnail', $this->id, $post_id ); ?>
+            <?php do_action( 'bsfep_before_thumbnail', $this->id, $post_id ); ?>
 
             <?php if ( $this->has_post_thumbnail ): ?>
                 <div id="postimagediv">
@@ -45,7 +45,7 @@
                 </div>
 			<?php endif; ?>
 
-			<?php do_action( 'bp_sfep_before_taxonomy_terms', $this->id, $post_id ); ?>
+			<?php do_action( 'bsfep_before_taxonomy_terms', $this->id, $post_id ); ?>
 
             <!-- taxonomy terms box -->
 			<?php if ( $this->has_tax() ): ?>
@@ -55,7 +55,7 @@
                 </div>
 			<?php endif; ?>
 
-			<?php do_action( 'bp_sfep_before_custom_fields', $this->id, $post_id ); ?>
+			<?php do_action( 'bsfep_before_custom_fields', $this->id, $post_id ); ?>
 
             <!-- custom fields -->
 			<?php if ( $this->has_custom_fields() ): ?>
@@ -71,7 +71,7 @@
 
 			<?php endif; ?>
 
-			<?php do_action( 'bp_sfep_before_comment_options', $this->id, $post_id ); ?>
+			<?php do_action( 'bsfep_before_comment_options', $this->id, $post_id ); ?>
 
 			<?php if ( $this->show_comment_option ): ?>
 
@@ -96,7 +96,7 @@
 
 			<?php endif; ?>
 
-            <?php do_action( 'bp_sfep_before_submit', $this->id, $post_id ); ?>
+            <?php do_action( 'bsfep_before_submit', $this->id, $post_id ); ?>
 
             <input type="hidden" value="<?php echo $_SERVER['REQUEST_URI']; ?>" name="post_form_url"/>
             <input id="submit" name='bp_simple_post_form_subimitted' type="submit" value="<?php _e( 'Post', 'bp-simple-front-end-post' ); ?>"/>
