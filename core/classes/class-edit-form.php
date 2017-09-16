@@ -287,33 +287,29 @@ class BPSimpleBlogPostEditForm {
 	public function save() {
 
 		$post_id = false;
-		//verify nonce
+
+		// Verify nonce.
 		if ( ! wp_verify_nonce( $_POST['_wpnonce'], 'bp_simple_post_new_post_' . $this->id ) ) {
 			bp_core_add_message( __( 'The Security check failed!', 'bpsfep' ), 'error' );
-
-			return;//do not proceed
+			return; // Do not proceed.
 		}
 
 		$post_type_details = get_post_type_object( $this->post_type );
 
 		$title   = $_POST['bp_simple_post_title'];
 		$content = $_POST['bp_simple_post_text'];
-
 		$message = '';
 		$error   = '';
-
 		$is_new = true;
 
 		if ( isset( $_POST['post_id'] ) ) {
-
 			$post_id = $_POST['post_id'];
-
 		}
 
 		if ( ! empty( $post_id ) ) {
 
 			$post = get_post( $post_id );
-			//in future, we may relax this check
+			// In future, we may relax this check.
 			if ( ! ( $post->post_author == get_current_user_id() || is_super_admin() ) ) {
 				$error   = true;
 				$message = __( 'You are not authorized for the action!', 'bp-simple-front-end-post' );
@@ -329,6 +325,11 @@ class BPSimpleBlogPostEditForm {
 		}
 
 		$error = apply_filters( 'bsfep_validate_post', $error, $_POST );
+
+		if ( $error && is_array( $error ) ) {
+			$message = $error['message'];
+			$error = $error['error'];
+		}
 
 		if ( ! $error ) {
 
@@ -358,7 +359,6 @@ class BPSimpleBlogPostEditForm {
 
 			if ( ! empty( $post_id ) ) {
 				$post_data['ID'] = $post_id;
-				//EDIT
 			}
 
 			$post_id = wp_insert_post( $post_data );
