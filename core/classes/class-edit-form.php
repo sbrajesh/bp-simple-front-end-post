@@ -796,7 +796,7 @@ class BPSimpleBlogPostEditForm {
 			'selected'        => $selected,
 			'show_option_all' => $show_option_all,
 			'echo'            => false,
-			'excluded'        => $excluded,
+			'exclude'         => $excluded,
 			'hierarchical'    => $hierarchical,
 			'child_of'        => $child_of,
 			'orderby'         => $orderby,
