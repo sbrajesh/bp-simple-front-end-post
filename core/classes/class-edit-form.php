@@ -594,7 +594,7 @@ class BPSimpleBlogPostEditForm {
 				foreach ( $options as $option ) {//how to validate
 					$vals[] = $option['value'];
 				}
-				$sanitized = array_diff( $vals, (array) $vals );
+				$sanitized = array_intersect( $vals, (array) $value );
 				break;
 
 			case 'url':
