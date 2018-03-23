@@ -17,9 +17,16 @@ class BPSimpleBlogPostEditForm {
 	 */
 	protected $id;
 
+	/**
+	 * Post id
+	 *
+	 * @var int
+	 */
 	protected $post_id = 0;
+
 	/**
 	 * It is the responsibility of developer to set it true or false based on whether he wants to allow the current user to post or not
+	 *
 	 * @var boolean
 	 */
 	protected $current_user_can_post = false;
@@ -27,14 +34,14 @@ class BPSimpleBlogPostEditForm {
 	/**
 	 * Which post type we want to edit/create using the current form
 	 *
-	 * it can be any valid post type, you can specify it while registering the from
+	 * It can be any valid post type, you can specify it while registering the from
 	 *
 	 * @var string post_type, defaults to post
 	 */
 	protected $post_type = 'post';
 
 	/**
-	 * post status after the post is submitted via front end, defaults to draft
+	 * Post status after the post is submitted via front end, defaults to draft
 	 *
 	 * You can set it to 'publish' if you want to directly publish it
 	 * It can be set via settings while registering the form
@@ -46,6 +53,7 @@ class BPSimpleBlogPostEditForm {
 	/**
 	 * Who wrote this post?, the user_id of post autor, default to current logged in user
 	 * If it is not set, the logged in user will be attributed as the author
+	 *
 	 * @var int
 	 */
 	protected $post_author = false;
@@ -61,11 +69,16 @@ class BPSimpleBlogPostEditForm {
 	 * Custom Fields settings
 	 *
 	 * @var array Mutidimensional array with custom field settings
-	 *
 	 */
 	protected $custom_fields = array();
 
+	/**
+	 * Visisible meta
+	 *
+	 * @var boolean
+	 */
 	protected $has_visisible_meta = null;
+
 	/**
 	 * How many uploads are allowed
 	 *
@@ -78,12 +91,14 @@ class BPSimpleBlogPostEditForm {
 
 	/**
 	 * Enable/Disable support for post thumbnail
+	 *
 	 * @var boolean
 	 */
 	protected $has_post_thumbnail = false;
 
 	/**
 	 * Default comment status, is it open or closed?
+	 *
 	 * @var string
 	 */
 	protected $comment_status = 'open';
@@ -97,6 +112,7 @@ class BPSimpleBlogPostEditForm {
 
 	/**
 	 * Used to store error/success message
+	 *
 	 * @var string
 	 */
 	public $message = '';
@@ -123,6 +139,12 @@ class BPSimpleBlogPostEditForm {
 	 */
 	protected $allow_upload = false;
 
+	/**
+	 * BPSimpleBlogPostEditForm constructor.
+	 *
+	 * @param string $name Form name.
+	 * @param array  $settings Settings array.
+	 */
 	public function __construct( $name, $settings ) {
 
 		$this->id = md5( trim( $name ) );
@@ -139,55 +161,55 @@ class BPSimpleBlogPostEditForm {
 			'show_comment_option'   => $this->show_comment_option,
 			'comment_status'        => $this->comment_status,
 			'current_user_can_post' => is_user_logged_in(),
-			//it may be a bad decision on my part, do we really want to allow all logged in users to post?
+			// It may be a bad decision on my part, do we really want to allow all logged in users to post?.
 			'allow_upload'          => false,
 		);
 
 		$args = wp_parse_args( $settings, $default );
-		extract( $args );
 
-		$this->post_type   = $post_type;
-		$this->post_status = $post_status;
+		$this->post_type   = $args['post_type'];
+		$this->post_status = $args['post_status'];
 
-		//if the author id is given
-		if ( $post_author ) {
-			$this->post_author = $post_author;
+		// If the author id is given.
+		if ( $args['post_author'] ) {
+			$this->post_author = $args['post_author'];
 		} else {
 			$this->post_author = get_current_user_id();
 		}
-		//we will process the taxonomy & meta later
-		$this->tax = $tax;
 
-		$this->custom_fields = $custom_fields;
+		// We will process the taxonomy & meta later.
+		$this->tax = $args['tax'];
 
-		$this->current_user_can_post = $current_user_can_post; //we will change later for context
+		$this->custom_fields = $args['custom_fields'];
 
-		//upload count is deprecated, use allow_upload instead 
-		$this->upload_count = $upload_count;
+		$this->current_user_can_post = $args['current_user_can_post']; // We will change later for context.
 
-		$this->allow_upload = $allow_upload;
+		// Upload count is deprecated, use allow_upload instead.
+		$this->upload_count = $args['upload_count'];
 
-		//back compat
+		$this->allow_upload = $args['allow_upload'];
+
 		if ( ! $this->allow_upload && $this->upload_count ) {
 			$this->allow_upload = true;
 		}
 
-		$this->has_post_thumbnail = $has_post_thumbnail;
+		$this->has_post_thumbnail = $args['has_post_thumbnail'];
 
 		if ( ! $this->allow_upload ) {
-			$this->has_post_thumbnail = false;//when upload is disabled, we don't want the featured image thingy
+			$this->has_post_thumbnail = false; // When upload is disabled, we don't want the featured image thing.
 		}
 
-		if ( $comment_status ) {
-			$this->comment_status = $comment_status;
+		if ( $args['comment_status'] ) {
+			$this->comment_status = $args['comment_status'];
 		}
 
-		if ( isset( $show_comment_option ) ) {
-			$this->show_comment_option = $show_comment_option;
+		if ( isset( $args['show_comment_option'] ) ) {
+			$this->show_comment_option = $args['show_comment_option'];
 		}
-		//is update callback given?
-		if ( isset( $update_callback ) ) {
-			$this->update_callback = $update_callback;
+
+		// Is update callback given?.
+		if ( isset( $args['update_callback'] ) ) {
+			$this->update_callback = $args['update_callback'];
 		}
 	}
 
@@ -200,7 +222,7 @@ class BPSimpleBlogPostEditForm {
 			return;
 		}
 
-		//needed for category/term walker
+		// Needed for category/term walker.
 		require_once( trailingslashit( ABSPATH ) . 'wp-admin/includes/template.php' );
 		require_once( trailingslashit( ABSPATH ) . 'wp-admin/includes/post.php' );
 
@@ -211,7 +233,6 @@ class BPSimpleBlogPostEditForm {
 	 * Locate and load post from
 	 * we need to allow theme authors to modify it
 	 * so, we will first look into the template directory and if not found, we will load it from the plugin's included file
-	 *
 	 */
 	protected function load_post_form() {
 
@@ -225,8 +246,7 @@ class BPSimpleBlogPostEditForm {
 		);
 
 		if ( ! empty( $post_id ) ) {
-			//should we check if current user can edit this post ?
-			$post = get_post( $post_id );
+			$post = get_post( $post_id ); // Should we check if current user can edit this post?.
 
 			if ( $post->post_status == 'auto-draft' ) {
 				$post->post_title = '';
@@ -234,17 +254,19 @@ class BPSimpleBlogPostEditForm {
 
 			$args = array(
 				'title'   => $post->post_title,
-				'content' => $post->post_content
+				'content' => $post->post_content,
 			);
 
 			$default = wp_parse_args( $args, $default );
 		}
 
-
 		extract( $default );
-		//think about more flexibility her
-		if ( $located = locate_template( array( 'feposting/form.php' ), false ) ) {
-			require_once $located;//we may load it any no. of times
+
+		$located = locate_template( array( 'feposting/form.php' ), false );
+
+		// Think about more flexibility her.
+		if ( $located ) {
+			require_once $located; // We may load it any no. of times.
 		} else {
 			include bp_simple_blog_post_helper()->get_path() . 'form.php';
 		}
@@ -253,8 +275,8 @@ class BPSimpleBlogPostEditForm {
 	/**
 	 * Get associated term ids for a post/post type
 	 *
-	 * @param array $object_ids
-	 * @param string $tax
+	 * @param array  $object_ids Term ids array.
+	 * @param string $tax Taxonomy.
 	 *
 	 * @return array of term_ids
 	 */
@@ -269,6 +291,7 @@ class BPSimpleBlogPostEditForm {
 	/**
 	 * Get the post id
 	 * For editing, filter on the hook to return the post_id
+	 *
 	 * @return int
 	 */
 	protected function get_post_id() {
@@ -302,24 +325,32 @@ class BPSimpleBlogPostEditForm {
 		$error   = '';
 		$is_new = true;
 
+		$post_data = array(
+			'post_author'  => $this->post_author,
+			'post_content' => $content,
+			'post_type'    => $this->post_type,
+			'post_status'  => $this->post_status,
+			'post_title'   => $title,
+		);
+
 		if ( isset( $_POST['post_id'] ) ) {
 			$post_id = $_POST['post_id'];
 		}
 
 		if ( ! empty( $post_id ) ) {
-
 			$post = get_post( $post_id );
+
+			$post_data['post_date'] = $post->post_date;
 			// In future, we may relax this check.
 			if ( ! ( $post->post_author == get_current_user_id() || is_super_admin() ) ) {
 				$error   = true;
 				$message = __( 'You are not authorized for the action!', 'bp-simple-front-end-post' );
 			}
 
-			$is_new = false; //this is an update of existing post
+			$is_new = false; // This is an update of existing post.
 		}
 
 		if ( empty( $title ) || empty( $content ) ) {
-
 			$error   = true;
 			$message = __( 'Please make sure to fill the required fields', 'bp-simple-front-end-post' );
 		}
@@ -333,24 +364,19 @@ class BPSimpleBlogPostEditForm {
 
 		if ( ! $error ) {
 
-			$post_data = array(
-				'post_author'  => $this->post_author,
-				'post_content' => $content,
-				'post_type'    => $this->post_type,
-				'post_status'  => $this->post_status,
-				'post_title'   => $title,
-
-			);
+			if ( ! empty( $post ) ) {
+				$post_data['post_date'] = $post->post_date;
+			}
 
 			if ( ! empty( $_POST['_thumbnail_id'] ) ) {
 				$post_data['_thumbnail_id'] = absint( $_REQUEST['_thumbnail_id'] );
 			}
 
-			//find comment_status
+			// Find comment_status.
 			$comment_status = isset( $_POST['bp_simple_post_comment_status'] ) ? $_POST['bp_simple_post_comment_status'] : $this->comment_status;
 
 			if ( empty( $comment_status ) && ! $post_id ) {
-				$comment_status = 'closed';//user has not checked it
+				$comment_status = 'closed'; // User has not checked it.
 			}
 
 			if ( $comment_status ) {
@@ -362,28 +388,28 @@ class BPSimpleBlogPostEditForm {
 			}
 
 			$post_id = wp_insert_post( $post_data );
-			//if everything worked fine, the post was saved
+			// If everything worked fine, the post was saved.
 			if ( ! is_wp_error( $post_id ) ) {
-				//update the taxonomy
-				//currently does not check if post type is associated with the taxonomy or not
-				//TODO: Make sure to check for the association of post type and category
+				// Update the taxonomy.
+				// Currently does not check if post type is associated with the taxonomy or not.
+				// TODO: Make sure to check for the association of post type and category.
 				if ( ! empty( $this->tax ) ) {
-					//if we have some taxonomy info
-					//tax_slug=>tax_options set for that taxonomy while registering the form
+					// If we have some taxonomy info
+					// Tax_slug=>tax_options set for that taxonomy while registering the form.
 
 					foreach ( $this->tax as $tax => $tax_options ) {
 
 						$selected_terms = array();
-						//get all selected terms, may be array, depends on whether a dd or checkklist
+						// Get all selected terms, may be array, depends on whether a dd or checkklist.
 						if ( isset( $_POST['tax_input'][ $tax ] ) ) {
 							$selected_terms = (array) $_POST['tax_input'][ $tax ];
 						}
 
-						//check if include is given when the form was registered and this is a subset of include
+						// Check if include is given when the form was registered and this is a subset of include.
 						if ( ! empty( $tax_options['include'] ) ) {
 
-							$allowed = $tax_options['include']; //this is an array
-							//check a diff of selected vs include
+							$allowed = $tax_options['include']; // This is an array.
+							// Check a diff of selected vs include.
 							$is_fake = array_diff( $selected_terms, $allowed );
 
 							if ( ! empty( $is_fake ) ) {
@@ -391,41 +417,38 @@ class BPSimpleBlogPostEditForm {
 							} //we have fake input vales, do not store
 						}
 
-						//if we are here, everything is fine
-
-						//it can still be empty, if the user has not selected anything and nothing was given
-						//post to all the allowed terms
+						/**
+						 * If we are here, everything is fine.
+						 * it can still be empty, if the user has not selected anything and nothing was given
+						 * post to all the allowed terms
+						 */
 						if ( empty( $selected_terms ) && isset( $tax_options['include'] ) ) {
 							$selected_terms = $tax_options['include'];
 						}
 
-						//update the taxonomy/post association
-
+						// Update the taxonomy/post association.
 						if ( ! empty( $selected_terms ) ) {
 							$selected_terms = array_map( 'intval', $selected_terms );
 							wp_set_object_terms( $post_id, $selected_terms, $tax );
 						}
 
-					}//end of the loop
-				}//end of taxonomy saving block
+					} // End of the loop
+				} // End of taxonomy saving block
 
-
-				//let us process the custom fields
-
-				//same strategy for the custom field as taxonomy
-
+				// Let us process the custom fields
+				// Same strategy for the custom field as taxonomy.
 				if ( ! empty( $this->custom_fields ) ) {
 					//which fields were updated
-					$updated_field = isset( $_POST['custom_fields'] ) ? (array) $_POST['custom_fields'] : array(); //array of key=>value pair
+					$updated_field = isset( $_POST['custom_fields'] ) ? (array) $_POST['custom_fields'] : array(); // Array of key=>value pair.
 
 					foreach ( $this->custom_fields as $key => $data ) {
-						//shouldn't we validate the data?
+						// Shouldn't we validate the data?.
 						$value = $this->get_validated( $key, $updated_field[ $key ], $data );
 
 						if ( is_array( $value ) ) {
-							//there were multiple values
-							//delete older one if there is a post id
-							//it may not be a very good idea to delete old post meta field, but we don't know the field has multiple entries or single and cann mess arounf
+							// There were multiple values
+							// Delete older one if there is a post id
+							// It may not be a very good idea to delete old post meta field, but we don't know the field has multiple entries or single and cann mess arounf.
 							if ( $post_id ) {
 								delete_post_meta( $post_id, $key );
 							}
@@ -438,12 +461,11 @@ class BPSimpleBlogPostEditForm {
 							update_post_meta( $post_id, $key, $value );
 						}
 					}
-				}//done for custom fields
+				} // Done for custom fields.
 
 
 				//check for upload
 				//upload and save
-
 
 				if ( get_post_status( $post_id ) == 'publish' ) {
 					$message = sprintf( __( '%s saved and published successfully.', 'bp-simple-front-end-post' ), $post_type_details->labels->singular_name );
@@ -461,19 +483,19 @@ class BPSimpleBlogPostEditForm {
 				}
 
 				return;
-
 			} else {
 				$error   = true;
 				$message = sprintf( __( 'There was a problem saving your %s. Please try again later.', 'bp-simple-front-end-post' ), $post_type_details->labels->singular_name );
 			}
 		}
-		//need to refactor the message/error infor data in next release when I will be modularizing the plugin a little bit more
+
+		// Need to refactor the message/error infor data in next release when I will be modularizing the plugin a little bit more
 		if ( ! $message ) {
 			$message = $this->message;
 		}
 
 		if ( $error ) {
-			$error = 'error';//buddypress core_add_message does not understand boolean properly
+			$error = 'error'; // Buddypress core_add_message does not understand boolean properly.
 		}
 
 		bp_core_add_message( $message, $error );
