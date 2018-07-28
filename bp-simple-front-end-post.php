@@ -9,6 +9,9 @@
  * License: GPL
  */
 
+// Do not allow direct access over web.
+defined( 'ABSPATH' ) || exit;
+
 /**
  * How to Use this plugin
  *
@@ -30,13 +33,31 @@
  */
 class BPSimpleBlogPostComponent {
 
+	/**
+	 * Singleton instance.
+	 *
+	 * @var BPSimpleBlogPostComponent
+	 */
 	private static $instance;
 
-	private $path = '';
-	private $url = '';
+	/**
+	 * Plugin Path.
+	 *
+	 * @var string
+	 */
+	private $path;
 
+	/**
+	 * Plugin Url.
+	 *
+	 * @var string
+	 */
+	private $url;
+
+	/**
+	 * BPSimpleBlogPostComponent constructor.
+	 */
 	private function __construct() {
-
 		$this->path = plugin_dir_path( __FILE__ );
 		$this->url  = plugin_dir_url( __FILE__ );
 
@@ -45,7 +66,6 @@ class BPSimpleBlogPostComponent {
 
 	/**
 	 * Factory method for singleton object
-	 *
 	 */
 	public static function get_instance() {
 
@@ -56,8 +76,10 @@ class BPSimpleBlogPostComponent {
 		return self::$instance;
 	}
 
+	/**
+	 * Setup hooks.
+	 */
 	public function setup() {
-
 		add_action( 'plugins_loaded', array( $this, 'load' ) );
 		add_action( 'bp_init', array( $this, 'load_textdomain' ), 2 );
 
@@ -67,10 +89,12 @@ class BPSimpleBlogPostComponent {
 
 		add_filter( 'ajax_query_attachments_args', array( $this, 'filter_ajax_attachment_args' ) );
 
-		add_action( 'wp_ajax_set-post-thumbnail', array( $this, 'set_post_thumbnail' ), 0 );//high priority
-
+		add_action( 'wp_ajax_set-post-thumbnail', array( $this, 'set_post_thumbnail' ), 0 );
 	}
 
+	/**
+	 * Load dependencies.
+	 */
 	public function load() {
 
 		$path = $this->path;
@@ -81,10 +105,6 @@ class BPSimpleBlogPostComponent {
 			'core/classes/class-editor.php',
 			'core/functions.php',
 		);
-
-		if ( is_admin() ) {
-			//	return ;//we don't need these in admin
-		}
 
 		foreach ( $files as $file ) {
 			require_once $path . $file;
@@ -100,17 +120,27 @@ class BPSimpleBlogPostComponent {
 	}
 
 	/**
+	 * Enable filters before upload.
 	 *
 	 * @return boolean
 	 */
 	public function enable_upload_filters() {
 
 		$apply = function_exists( 'is_buddypress' ) && is_buddypress() && ! did_action( 'wp_footer' );
-		$apply = apply_filters( 'bsfep_enable_upload_filters', $apply ) ;
+		$apply = apply_filters( 'bsfep_enable_upload_filters', $apply );
 
 		return $apply;
 	}
 
+	/**
+	 * Add upload capability to subscribers.
+	 *
+	 * @param array $allcaps all caps.
+	 * @param array $cap requested caps.
+	 * @param array $args extra args.
+	 *
+	 * @return array
+	 */
 	public function add_upload_cap_filter( $allcaps, $cap, $args ) {
 
 		if ( $args[0] != 'upload_files' && $args[0] != 'edit_post' ) {
@@ -121,10 +151,9 @@ class BPSimpleBlogPostComponent {
 			return $allcaps;
 		}
 
-		if ( $args[0] == 'upload_files' ) {
+		if ( 'upload_files' === $args[0] ) {
 			$allcaps[ $cap[0] ] = true;
-
-		} elseif ( $args[0] == 'edit_post' ) {
+		} elseif ( 'edit_post' === $args[0] ) {
 
 			$user_id = get_current_user_id();
 			$post_id = isset( $args[2] ) ? absint( $args[2] ) : 0;
@@ -137,19 +166,17 @@ class BPSimpleBlogPostComponent {
 
 				}
 			}
-
 		}
 
 		return $allcaps;
-
 	}
 
 	/**
 	 * Filter attachment for current user
 	 *
-	 * @param type $args
+	 * @param array $args args.
 	 *
-	 * @return type
+	 * @return array
 	 */
 	public function filter_ajax_attachment_args( $args ) {
 
@@ -164,60 +191,65 @@ class BPSimpleBlogPostComponent {
 		return $args;
 	}
 
-
+	/**
+	 * Load javascript files.
+	 */
 	public function load_js() {
 		wp_register_script( 'bsfep-js', $this->url . 'assets/bsfep.js', array( 'jquery' ), false, true );
 	}
 
+	/**
+	 * Load css.
+	 */
 	public function load_css() {
-
 	}
 
 	/**
 	 * Get file system path of this plugin directory
 	 *
-	 * @return type
+	 * @return string
 	 */
 	public function get_path() {
 		return $this->path;
 	}
 
+	/**
+	 * Set post thumbnail.
+	 */
 	public function set_post_thumbnail() {
 
-		$json = ! empty( $_REQUEST['json'] ); // New-style request
+		$json = ! empty( $_REQUEST['json'] ); // New-style request.
 
-		$post_ID = intval( $_POST['post_id'] );
+		$post_id = intval( $_POST['post_id'] );
 
 		$thumbnail_id = intval( $_POST['thumbnail_id'] );
 
 		if ( $json ) {
-			check_ajax_referer( "update-post_$post_ID" );
+			check_ajax_referer( "update-post_$post_id" );
 		} else {
-			check_ajax_referer( "set_post_thumbnail-$post_ID" );
+			check_ajax_referer( "set_post_thumbnail-$post_id" );
 		}
 		if ( $thumbnail_id == '-1' ) {
-			if ( delete_post_thumbnail( $post_ID ) ) {
-				$return = _wp_post_thumbnail_html( null, $post_ID );
+			if ( delete_post_thumbnail( $post_id ) ) {
+				$return = _wp_post_thumbnail_html( null, $post_id );
 				$json ? wp_send_json_success( $return ) : wp_die( $return );
 			} else {
 				wp_die( 0 );
 			}
 		}
 
-		if ( set_post_thumbnail( $post_ID, $thumbnail_id ) ) {
-			$return = _wp_post_thumbnail_html( $thumbnail_id, $post_ID );
+		if ( set_post_thumbnail( $post_id, $thumbnail_id ) ) {
+			$return = _wp_post_thumbnail_html( $thumbnail_id, $post_id );
 			$json ? wp_send_json_success( $return ) : wp_die( $return );
 		}
 
 		wp_die( 0 );
-
-
 	}
 }
 
 
 /**
- * get singleton instance
+ * Get singleton instance
  *
  * @return BPSimpleBlogPostComponent
  */

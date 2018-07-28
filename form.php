@@ -1,4 +1,9 @@
-<?php if ( $this->current_user_can_post ): ?>
+<?php
+/**
+ * Create/Edit Form.
+ */
+?>
+<?php if ( $this->current_user_can_post ) : ?>
 
     <div class="bp-simple-post-form">
 
@@ -11,7 +16,7 @@
 			<?php wp_nonce_field( 'bp_simple_post_new_post_' . $this->id ); ?>
 			<?php wp_nonce_field( 'update-post_' . $post_id, '_bsfep_media_uploader_nonce' ); ?>
 
-			<?php if ( $post_id ): ?>
+			<?php if ( $post_id ) : ?>
                 <input type="hidden" name="post_id" value="<?php echo $post_id; ?>" id="post_ID"/>
 			<?php endif; ?>
 
@@ -28,14 +33,13 @@
 
 				<?php wp_editor( $content, 'bp_simple_post_text', array(
 					'media_buttons' => $this->allow_upload,
-					'quicktags'     => false
+					'quicktags'     => false,
 				) ); ?>
-
             </label>
 
             <?php do_action( 'bsfep_before_thumbnail', $this->id, $post_id ); ?>
 
-            <?php if ( $this->has_post_thumbnail ): ?>
+            <?php if ( $this->has_post_thumbnail ) : ?>
                 <div id="postimagediv">
                     <div class="inside">
 						<?php $thumbnail_id = get_post_meta( $post->ID, '_thumbnail_id', true );
@@ -48,7 +52,7 @@
 			<?php do_action( 'bsfep_before_taxonomy_terms', $this->id, $post_id ); ?>
 
             <!-- taxonomy terms box -->
-			<?php if ( $this->has_tax() ): ?>
+			<?php if ( $this->has_tax() ) : ?>
                 <div class='simple-post-taxonomies-box clearfix'>
 					<?php $this->render_taxonomies(); ?>
                     <div class="clear"></div>
@@ -58,11 +62,11 @@
 			<?php do_action( 'bsfep_before_custom_fields', $this->id, $post_id ); ?>
 
             <!-- custom fields -->
-			<?php if ( $this->has_custom_fields() ): ?>
+			<?php if ( $this->has_custom_fields() ) : ?>
 
                 <div class='simple-post-custom-fields'>
 
-					<?php if ( $this->has_visible_meta() && $this->custom_field_title ): ?>
+					<?php if ( $this->has_visible_meta() && $this->custom_field_title ) : ?>
                         <h3> <?php echo $this->custom_field_title; ?> </h3>
 					<?php endif; ?>
 
@@ -73,7 +77,7 @@
 
 			<?php do_action( 'bsfep_before_comment_options', $this->id, $post_id ); ?>
 
-			<?php if ( $this->show_comment_option ): ?>
+			<?php if ( $this->show_comment_option ) : ?>
 
                 <div class="simple-post-comment-option">
 
@@ -104,4 +108,3 @@
     </div>
 
 <?php endif; ?>
-

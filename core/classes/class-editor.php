@@ -1,19 +1,34 @@
 <?php
-
-/*
+/**
  * Main controller class
  * stores various forms and delegates the post saving to appropriate form
- * 
  */
+// Do not allow direct access over web.
+defined( 'ABSPATH' ) || exit;
 
+/**
+ * Class BPSimpleBlogPostEditor
+ */
 class BPSimpleBlogPostEditor {
-
+	/**
+	 * Singleton.
+	 *
+	 * @var BPSimpleBlogPostEditor
+	 */
 	private static $instance;
-	private $forms = array(); // array of Post Forms(multiple post forms)
 
+	/**
+	 * Array of Post Forms(multiple post forms)
+	 *
+	 * @var array
+	 */
+	private $forms = array();
+
+	/**
+	 * BPSimpleBlogPostEditor constructor.
+	 */
 	private function __construct() {
-
-		//hook save action to init
+		// hook save action to init.
 		add_action( 'bp_ready', array( $this, 'save' ) );
 	}
 
@@ -34,15 +49,16 @@ class BPSimpleBlogPostEditor {
 	/**
 	 * Register a form
 	 *
-	 * @param BPSimpleBlogPostEditForm $form
+	 * @param BPSimpleBlogPostEditForm $form form object.
 	 */
 	public function register_form( $form ) {
-		$this->forms[ $form->get_id() ] = $form; //save/overwrite
+		$this->forms[ $form->get_id() ] = $form; // save/overwrite.
 	}
 
 	/**
+	 * Get a form object.
 	 *
-	 * @param string $form_name
+	 * @param string $form_name form name.
 	 *
 	 * @return BPSimpleBlogPostEditForm|boolean
 	 */
@@ -56,7 +72,7 @@ class BPSimpleBlogPostEditor {
 	/**
 	 * Returns the Form Object
 	 *
-	 * @param string $form_id
+	 * @param string $form_id form id.
 	 *
 	 * @return BPSimpleBlogPostEditForm|boolean
 	 */
@@ -73,23 +89,20 @@ class BPSimpleBlogPostEditor {
 	 * Save a post
 	 *
 	 * Delegates the task to  BPSimpleBlogPostEditForm::save() of appropriate form(which was submitted)
-	 *
 	 */
 	public function save() {
 
 		if ( ! empty( $_POST['bp_simple_post_form_subimitted'] ) ) {
-			//yeh form was submitted
-			//get form id
+			// yes, the form was submitted
+			// get form id.
 			$form_id = $_POST['bp_simple_post_form_id'];
 			$form    = $this->get_form_by_id( $form_id );
 
 			if ( ! $form ) {
-				return; //we don't need to do anything
+				return; // we don't need to do anything.
 			}
-			//so if it is a registerd form, let the form handle it
-
-			$form->save(); //save the post and redirect properly
+			// If it is a registered form, let the form handle it.
+			$form->save(); // save the post and redirect properly.
 		}
 	}
-
 }
