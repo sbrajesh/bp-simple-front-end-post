@@ -153,6 +153,20 @@ class BPSimpleBlogPostEditForm {
 	protected $has_visible_meta = null;
 
 	/**
+	 * Default post visibility.
+	 *
+	 * @var string
+	 */
+	protected $visibility = 'public';
+
+	/**
+	 * Enable visibility for the post.
+	 *
+	 * @var bool
+	 */
+	protected $enable_visibility = false;
+
+	/**
 	 * BPSimpleBlogPostEditForm constructor.
 	 *
 	 * @param string $name Form name.
@@ -173,6 +187,8 @@ class BPSimpleBlogPostEditForm {
 			'has_post_thumbnail'    => 1,
 			'show_comment_option'   => $this->show_comment_option,
 			'comment_status'        => $this->comment_status,
+			'enable_visibility'     => $this->enable_visibility,
+			'visibility'            => $this->visibility,
 			'current_user_can_post' => is_user_logged_in(),
 			// It may be a bad decision on my part, do we really want to allow all logged in users to post?.
 			'allow_upload'          => false,
@@ -224,6 +240,9 @@ class BPSimpleBlogPostEditForm {
 		if ( isset( $args['update_callback'] ) ) {
 			$this->update_callback = $args['update_callback'];
 		}
+
+		$this->visibility = $args['visibility'];
+		$this->enable_visibility = $args['enable_visibility'];
 	}
 
 	/**
@@ -398,6 +417,14 @@ class BPSimpleBlogPostEditForm {
 
 			if ( ! empty( $post_id ) ) {
 				$post_data['ID'] = $post_id;
+			}
+
+			if ( $this->enable_visibility && ! empty( $_POST['bp_simple_post_visibility'] ) && 'publish' == $this->post_status  ) {
+				switch ( $_POST['bp_simple_post_visibility'] ) {
+					case 'private':
+						$post_data['post_status'] = 'private';
+						break;
+				}
 			}
 
 			$post_id = wp_insert_post( $post_data );

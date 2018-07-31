@@ -36,6 +36,20 @@
 					'quicktags'     => false,
 				) ); ?>
             </label>
+	        <?php if ( $this->enable_visibility && 'publish' == $this->post_status) : ?>
+                <div class="bp_simple_post_visibility-wrapper">
+                    <label><?php _e( 'Visibility:', 'bp-simple-front-end-post' ); ?></label>
+                    <label for="bp_simple_post_visibility_public">
+                        <input type="radio" name="bp_simple_post_visibility" id="bp_simple_post_visibility_public"
+                               value="public"> <?php _e( 'Public', 'bp-simple-front-end-post' ); ?>
+                    </label>
+                    <label for="bp_simple_post_visibility_private">
+                        <input type="radio" name="bp_simple_post_visibility" id="bp_simple_post_visibility_private"
+                               value="private"> <?php _e( 'Private', 'bp-simple-front-end-post' ); ?>
+                    </label>
+
+                </div>
+	        <?php endif; ?>
 
             <?php do_action( 'bsfep_before_thumbnail', $this->id, $post_id ); ?>
 
