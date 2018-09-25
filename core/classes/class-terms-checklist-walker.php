@@ -65,6 +65,7 @@ class BPSimplePostTermsChecklistWalker extends Walker {
 
 		$popular_cats  = isset( $args['popular_cats'] ) ? $args['popular_cats'] : '';
 		$selected_cats = isset( $args['selected_cats'] ) ? $args['selected_cats'] : '';
+		$taxonomy      = isset( $args['taxonomy'] ) ? $args['taxonomy'] : '';
 
 		if ( empty( $taxonomy ) ) {
 			$taxonomy = 'category';
