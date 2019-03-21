@@ -480,6 +480,10 @@ class BPSimpleBlogPostEditForm {
 					$updated_field = isset( $_POST['custom_fields'] ) ? (array) $_POST['custom_fields'] : array(); // Array of key=>value pair.
 
 					foreach ( $this->custom_fields as $key => $data ) {
+						if ( in_array( $data['type'], array( 'file', 'image' ) ) ) {
+							$this->handle_upload_field( $post_id, $key, $data );
+							continue;
+						}
 						// Shouldn't we validate the data?.
 						$value = $this->get_validated( $key, $updated_field[ $key ], $data );
 
@@ -563,6 +567,7 @@ class BPSimpleBlogPostEditForm {
 		switch ( $type ) {
 
 			case 'textbox':
+			case 'text':
 				$input = "<label>{$label}<input type='text' name='{$name}' id='custom-field-{$key}' value='{$current_value}' /></label>";
 				break;
 
@@ -604,6 +609,18 @@ class BPSimpleBlogPostEditForm {
 				$input = "<label>{$label}<input type='text' class='bp-simple-front-end-post-url'  id='custom-field-{$key}' name='{$name}' value='{$current_value}' /></label>";
 				break;
 
+			case 'image':
+			case 'file':
+				$input = "<label>{$label}<input type='file' class='bp-simple-front-end-post-file'  id='custom-field-{$key}' name='custom-fields_{$key}'/></label>";
+				if ( $current_value ) {
+					$input .= "<div class='bp-simple-front-end-post-file-attachments'>";
+					$input .= "<a href='" . esc_url( $current_value ) . "'>" . wp_basename( $current_value ) . '</a>';
+					$input .= "<label><input type='checkbox' value='1' name='{$key}_delete' >" . __( 'Delete', 'bp-simple-front-end-post' ) . '</label>';
+					$input .= '</div>';
+				}
+
+				break;
+
 			case 'hidden':
 				$input = "<input type='hidden' class='bp-simple-front-end-post-hidden'  id='custom-field-{$key}' name='{$name}' value='{$current_value}' />";
 				break;
@@ -633,6 +650,7 @@ class BPSimpleBlogPostEditForm {
 
 		switch ( $type ) {
 			case 'textbox':
+			case 'text':
 			case 'date':
 			case 'textarea':
 			case 'hidden':
@@ -641,7 +659,6 @@ class BPSimpleBlogPostEditForm {
 
 			case 'radio':
 			case 'select':
-
 				foreach ( $options as $option ) {
 					if ( $option['value'] == $value ) {
 						$sanitized = $value;
@@ -673,6 +690,65 @@ class BPSimpleBlogPostEditForm {
 
 		return $sanitized;
 	}
+
+	/**
+	 * Handle upload field.
+	 *
+	 * @param int    $post_id post id.
+	 * @param string $meta_key meta key.
+	 * @param array  $meta_options options.
+	 *
+	 * @return bool
+	 */
+	public function handle_upload_field( $post_id, $meta_key, $meta_options ) {
+		// 1. check if we should delete old.
+		if ( ! empty( $_POST[ $meta_key . '_delete' ] ) ) {
+			$this->delete_file( $post_id, $meta_key );
+		}
+
+		// check if a file was submitted.
+		$attachment = $this->handle_upload( $post_id, 'custom-fields_'. $meta_key, 'bp_simple_post_new_post_' . $post_id );
+
+		if ( is_wp_error( $attachment ) ) {
+			return false;
+		}
+
+		$this->delete_file( $post_id, $meta_key );
+		// store complete path, even though it is restrictive,
+		// it has advantage when used with remote storage.
+		// save to meta.
+		$url = wp_get_attachment_url( $attachment );
+		if ( $url ) {
+			// store.
+			update_post_meta( $post_id, $meta_key, $url );
+			update_post_meta( $post_id, $meta_key . '_attachment_id', $attachment );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Delete file.
+	 *
+	 * @param int $post_id post id.
+	 * @param int $meta_key meta key.
+	 */
+	public function delete_file( $post_id, $meta_key ) {
+		$attachment_id = get_post_meta( $post_id, $meta_key . '_attachment_id', true );
+		$attachment    = get_post( $attachment_id );
+		// remove meta, no need to test for rights.
+		delete_post_meta( $post_id, $meta_key );
+		delete_post_meta( $post_id, $meta_key . '_attachment_id' );
+
+		if ( ! $attachment ) {
+			return;
+		}
+
+		if ( current_user_can( 'edit_others_posts' ) || $attachment->post_author == get_current_user_id() ) {
+			wp_delete_attachment( $attachment_id );
+		}
+	}
+
 
 	/**
 	 * Handles Upload
