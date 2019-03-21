@@ -346,7 +346,33 @@ class BPSimpleBlogPostEditForm {
 		// Verify nonce.
 		if ( ! wp_verify_nonce( $_POST['_wpnonce'], 'bp_simple_post_new_post_' . $this->id ) ) {
 			bp_core_add_message( __( 'The Security check failed!', 'bpsfep' ), 'error' );
+
 			return; // Do not proceed.
+		}
+		// Step 1. validate.
+		$errors = array();
+
+		// validate custom fields.
+		foreach ( $this->custom_fields as $key => $field_setting ) {
+			if ( empty( $field_setting['required'] ) ) {
+				continue;
+			}
+
+			if ( in_array( $field_setting['type'], array(
+					'file',
+					'image',
+				) ) && empty( $_FILES[ 'custom-fields_' . $key ] ) ) {
+				$errors[ $key ] = sprintf( '<span>%s</span> is required.', $field_setting['label'] );
+			} elseif ( empty( $_POST[ $key ] ) ) {
+				$errors[ $key ] = sprintf( '<span>%s</span> is required.', $field_setting['label'] );
+			}
+
+		}
+
+		if ( ! empty( $errors ) ) {
+			bp_core_add_message( join( ' ', $errors ), 'error' );
+
+			return;
 		}
 
 		$post_type_details = get_post_type_object( $this->post_type );
@@ -485,7 +511,7 @@ class BPSimpleBlogPostEditForm {
 							continue;
 						}
 						// Shouldn't we validate the data?.
-						$value = $this->get_validated( $key, $updated_field[ $key ], $data );
+						$value = $this->get_validated( $key, isset( $updated_field[ $key ] ) ? $updated_field[ $key ] : '', $data );
 
 						if ( is_array( $value ) ) {
 							// There were multiple values
