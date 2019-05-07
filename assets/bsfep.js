@@ -1,6 +1,6 @@
 jQuery( document ).ready( function () {
 	
-	if ( typeof wp == 'undefined' || typeof wp.media == 'undefined' || typeof wp.media.model == 'undefined' || typeof wp.media.view == 'undefined' ) {
+	if ( typeof wp == 'undefined' || typeof wp.media == 'undefined' || typeof wp.media.model == 'undefined' || typeof wp.media.view == 'undefined' || wp.media.view.settings == undefined ) {
 		return ;
 	}
 	
