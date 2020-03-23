@@ -139,3 +139,145 @@ function bsfep_get_default_post_to_edit( $post_type = 'post', $create_in_db = fa
 
 	return $post;
 }
+
+/**
+ * Get a validated value for the custom field data
+ *
+ * @param string $key name.
+ * @param mixed  $value value to validate.
+ * @param array  $data other details.
+ *
+ * @return string
+ */
+function bpsfep_get_validate_value( $key, $value, $data ) {
+
+	$type    = isset( $data['type'] ) ? $data['type'] : '';
+	$options = isset( $data['options'] ) ? $data['options'] : '';
+
+	$sanitized = '';
+
+	switch ( $type ) {
+		case 'textbox':
+		case 'text':
+		case 'date':
+		case 'textarea':
+		case 'hidden':
+			$sanitized = esc_attr( $value ); // should we escape?
+			break;
+
+		case 'radio':
+		case 'select':
+			foreach ( $options as $option ) {
+				if ( $option['value'] == $value ) {
+					$sanitized = $value;
+				}
+			}
+
+			break;
+		// for checkbox.
+		case 'checkbox':
+			$vals = array();
+
+			foreach ( $options as $option ) {// how to validate?
+				$vals[] = $option['value'];
+			}
+			$sanitized = array_intersect( $vals, (array) $value );
+			break;
+
+		case 'url':
+			$sanitized = esc_url( $value );
+			break;
+
+		case 'number':
+			$sanitized = intval( $value );
+			break;
+		default:
+			$sanitized = '';
+			break;
+	}
+
+	return $sanitized;
+}
+
+function bsfep_get_field_render_html( $field_data, $current_value = false, $parent_name = 'custom_fields' ) {
+	$key   = isset( $field_data['key'] ) ? $field_data['key'] : '';
+	$label = isset( $field_data['label'] ) ? $field_data['label'] : '';
+
+	$type    = isset( $field_data['type'] ) ? $field_data['type'] : '';
+	$options = isset( $field_data['options'] ) ? $field_data['options'] : '';
+
+	$current_value = esc_attr( $current_value );
+
+	$name = "{$parent_name}[{$key}]";
+
+	if ( 'checkbox' === $type ) {
+		$name = $name . '[]';
+	}
+
+	switch ( $type ) {
+
+		case 'textbox':
+		case 'text':
+			$input = "<label>{$label}<input type='text' name='{$name}' id='custom-field-{$key}' value='{$current_value}' /></label>";
+			break;
+
+		case 'textarea':
+			$input = "<label>{$label}</label><textarea  name='{$name}' id='custom-field-{$key}' >{$current_value}</textarea>";
+			break;
+
+		case 'radio':
+			$input = "<label>{$label}</label>";
+
+			foreach ( $options as $option ) {
+				$input .= "<label>{$option['label']}<input type='radio' name='{$name}' " . checked( $option['value'], $current_value, false ) . "  value='" . $option['value'] . "' /></label>";
+			}
+			break;
+
+		case 'select':
+			$input = "<label>{$label}<select name='{$name}' id='custom-field-{$key}'>";
+
+			foreach ( $options as $option ) {
+				$input .= '<option  ' . selected( $option['value'], $current_value, false ) . "  value='" . $option['value'] . "' >{$option['label']}</option>";
+			}
+			$input .= '</select></label>';
+			break;
+
+		case 'checkbox':
+			$input = "<label>{$label}</label>";
+
+			foreach ( $options as $option ) {
+				$input .= "<label>{$option['label']}<input type='checkbox' name='{$name}' " . checked( $option['value'], $current_value, false ) . "  value='" . $option['value'] . "' /></label>";
+			}
+
+			break;
+
+		case 'date':
+			$input = "<label>{$label}<input type='text' class='bp-simple-front-end-post-date'  id='custom-field-{$key}' name='{$name}' value='{$current_value}' /></label>";
+			break;
+
+		case 'url':
+			$input = "<label>{$label}<input type='text' class='bp-simple-front-end-post-url'  id='custom-field-{$key}' name='{$name}' value='{$current_value}' /></label>";
+			break;
+
+		case 'image':
+		case 'file':
+			$input = "<label>{$label}<input type='file' class='bp-simple-front-end-post-file'  id='custom-field-{$key}' name='custom-fields_{$key}'/></label>";
+			if ( $current_value ) {
+				$input .= "<div class='bp-simple-front-end-post-file-attachments'>";
+				$input .= "<a href='" . esc_url( $current_value ) . "'>" . wp_basename( $current_value ) . '</a>';
+				$input .= "<label><input type='checkbox' value='1' name='{$key}_delete' >" . __( 'Delete', 'bp-simple-front-end-post' ) . '</label>';
+				$input .= '</div>';
+			}
+
+			break;
+
+		case 'hidden':
+			$input = "<input type='hidden' class='bp-simple-front-end-post-hidden'  id='custom-field-{$key}' name='{$name}' value='{$current_value}' />";
+			break;
+
+		default:
+			$input = '';
+	}
+
+	return $input; // return html.
+}
