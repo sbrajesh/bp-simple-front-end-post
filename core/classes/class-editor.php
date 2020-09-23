@@ -101,8 +101,10 @@ class BPSimpleBlogPostEditor {
 			if ( ! $form ) {
 				return; // we don't need to do anything.
 			}
+			do_action( 'bp_fsep_before_post_save' );
 			// If it is a registered form, let the form handle it.
 			$form->save(); // save the post and redirect properly.
+			do_action( 'bp_fsep_after_post_save' );
 		}
 	}
 }
