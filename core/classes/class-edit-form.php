@@ -761,7 +761,7 @@ class BPSimpleBlogPostEditForm {
 
 			foreach ( $keys as $k ) {
 
-				if ( in_array( $categories[ $k ]->term_id, $args['selected_cats'] ) ) {
+				if ( is_array($args['selected_cats'] ) && in_array( $categories[ $k ]->term_id, $args['selected_cats'] ) ) {
 					$checked_categories[] = $categories[ $k ];
 					unset( $categories[ $k ] );
 				}
